@@ -1,19 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import ArticleEditor from '@/components/ArticleEditor';
+
+// Define TipTap editor content type
+interface TipTapContent {
+  type: string;
+  content?: TipTapContent[];
+  text?: string;
+  attrs?: Record<string, unknown>;
+  marks?: Array<{
+    type: string;
+    attrs?: Record<string, unknown>;
+  }>;
+}
 
 interface Article {
   title: string;
-  content: any;
+  content: TipTapContent | null;
   coverImage: string;
   tags: string[];
 }
 
-export default function EditArticlePage({ params }: { params: { id: string } }) {
+export default function EditArticlePage() {
   const router = useRouter();
-  const { id } = params;
+  const params = useParams();
+  const id = params?.id as string;
   const isNewArticle = id === 'new';
   
   const [isLoading, setIsLoading] = useState(true);
@@ -27,17 +41,17 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
   const [tagInput, setTagInput] = useState('');
   
   useEffect(() => {
-    if (!isNewArticle) {
-      fetchArticle();
+    if (!isNewArticle && id) {
+      fetchArticle(id);
     } else {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, isNewArticle]);
   
-  async function fetchArticle() {
+  async function fetchArticle(articleId: string) {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/articles/${id}`);
+      const response = await fetch(`/api/articles/${articleId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch article');
@@ -86,7 +100,7 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
     }
   }
   
-  function handleContentChange(content: any) {
+  function handleContentChange(content: TipTapContent) {
     setArticle({ ...article, content });
   }
   
@@ -139,11 +153,13 @@ export default function EditArticlePage({ params }: { params: { id: string } }) 
           placeholder="https://example.com/image.jpg"
         />
         {article.coverImage && (
-          <div className="mt-2">
-            <img
+          <div className="mt-2 relative h-40 w-full">
+            <Image
               src={article.coverImage}
               alt="Cover preview"
-              className="h-40 object-cover rounded-md"
+              fill
+              style={{ objectFit: 'cover' }}
+              className="rounded-md"
             />
           </div>
         )}

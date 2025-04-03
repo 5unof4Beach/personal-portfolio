@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/helpers/auth';
 import mongoose from 'mongoose';
 
 // GET - Get a single article by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -44,17 +44,16 @@ export async function GET(
 // PATCH - Update an article
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { id } = params;
+    const { id } = await params;
     
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -93,17 +92,16 @@ export async function PATCH(
 // DELETE - Delete an article
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { id } = params;
+    const { id } = await params;
     
     if (!mongoose.isValidObjectId(id)) {
       return NextResponse.json(
@@ -131,4 +129,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

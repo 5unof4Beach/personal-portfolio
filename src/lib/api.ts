@@ -25,7 +25,7 @@ export async function fetchData<T>(url: string, options?: RequestInit): Promise<
 /**
  * POST request wrapper
  */
-export async function postData<T>(url: string, data: any): Promise<T> {
+export async function postData<T, D = Record<string, unknown>>(url: string, data: D): Promise<T> {
   return fetchData<T>(url, {
     method: 'POST',
     headers: {
@@ -38,7 +38,7 @@ export async function postData<T>(url: string, data: any): Promise<T> {
 /**
  * PUT request wrapper
  */
-export async function putData<T>(url: string, data: any): Promise<T> {
+export async function putData<T, D = Record<string, unknown>>(url: string, data: D): Promise<T> {
   return fetchData<T>(url, {
     method: 'PUT',
     headers: {

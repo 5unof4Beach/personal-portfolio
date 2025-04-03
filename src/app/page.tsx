@@ -1,7 +1,7 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import connectToDatabase from '@/lib/mongodb';
 import Profile from '@/models/Profile';
-import { FlattenMaps } from 'mongoose';
 
 // Define interface for profile data
 interface ProfileData {
@@ -67,7 +67,7 @@ export default async function Home() {
         <div className="max-w-md text-center">
           <h1 className="mb-4 text-3xl font-bold">Welcome to Your Portfolio</h1>
           <p className="mb-6 text-gray-600">
-            It looks like you haven't set up your portfolio yet. Create an admin
+            It looks like you haven&apos;t set up your portfolio yet. Create an admin
             account to get started.
           </p>
           <Link
@@ -168,11 +168,15 @@ export default async function Home() {
                   className="overflow-hidden rounded-lg bg-white shadow-lg"
                 >
                   {project.image && (
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="h-48 w-full object-cover"
-                    />
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="object-cover"
+                      />
+                    </div>
                   )}
                   <div className="p-6">
                     <h3 className="mb-2 text-xl font-bold">{project.title}</h3>

@@ -20,7 +20,7 @@ export default function Error({
       <div className="text-center">
         <h1 className="mb-4 text-4xl font-bold text-red-600">Something went wrong!</h1>
         <p className="mb-8 text-lg text-gray-700">
-          We're sorry, but there was an error loading this page.
+          We&apos;re sorry, but there was an error loading this page.
         </p>
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <button

@@ -1,6 +1,7 @@
 import connectToDatabase from '@/lib/mongodb';
 import Article from '@/models/Article';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ArticlePreview {
   _id: string;
@@ -10,7 +11,7 @@ interface ArticlePreview {
   createdAt: string;
 }
 
-async function getArticles() {
+async function getArticles(): Promise<ArticlePreview[]> {
   try {
     await connectToDatabase();
     const articles = await Article.find({})
@@ -56,10 +57,12 @@ export default async function ArticlesPage() {
             <Link key={article._id} href={`/articles/${article._id}`}>
               <div className="bg-white rounded-lg shadow-md overflow-hidden h-full hover:shadow-lg transition-shadow duration-300">
                 {article.coverImage && (
-                  <div className="h-48 overflow-hidden">
-                    <img
+                  <div className="h-48 relative overflow-hidden">
+                    <Image
                       src={article.coverImage}
                       alt={article.title}
+                      fill
+                      style={{ objectFit: 'cover' }}
                       className="w-full h-full object-cover"
                     />
                   </div>

@@ -6,9 +6,21 @@ import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useState, useCallback } from 'react';
 
+// Define TipTap editor content type
+interface TipTapContent {
+  type: string;
+  content?: TipTapContent[];
+  text?: string;
+  attrs?: Record<string, unknown>;
+  marks?: Array<{
+    type: string;
+    attrs?: Record<string, unknown>;
+  }>;
+}
+
 type ArticleEditorProps = {
-  content: any;
-  onChange: (content: any) => void;
+  content: TipTapContent | null;
+  onChange: (content: TipTapContent) => void;
 };
 
 export default function ArticleEditor({ content, onChange }: ArticleEditorProps) {
@@ -24,8 +36,9 @@ export default function ArticleEditor({ content, onChange }: ArticleEditorProps)
     ],
     content: content || '',
     onUpdate: ({ editor }) => {
-      onChange(editor.getJSON());
+      onChange(editor.getJSON() as TipTapContent);
     },
+    immediatelyRender: false,
   });
 
   const uploadImage = useCallback(async (file: File) => {

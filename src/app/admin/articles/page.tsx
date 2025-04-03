@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface Article {
   _id: string;
@@ -118,11 +119,13 @@ export default function ArticlesListPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {article.coverImage && (
-                        <div className="flex-shrink-0 h-10 w-10 mr-4">
-                          <img
+                        <div className="flex-shrink-0 h-10 w-10 mr-4 relative">
+                          <Image
                             src={article.coverImage}
                             alt=""
-                            className="h-10 w-10 rounded-full object-cover"
+                            fill
+                            sizes="40px"
+                            className="rounded-full object-cover"
                           />
                         </div>
                       )}

@@ -8,7 +8,7 @@ interface MongooseCache {
 
 // Extend the global namespace
 declare global {
-  var mongoose: MongooseCache | undefined;
+  let mongoose: MongooseCache | undefined;
 }
 
 if (!process.env.MONGODB_URI) {
@@ -17,11 +17,12 @@ if (!process.env.MONGODB_URI) {
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Initialize cached with a default value if undefined
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cached: MongooseCache = (globalThis as any).mongoose || { conn: null, promise: null };
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cached = (globalThis as any).mongoose = { conn: null, promise: null };
 }
 
 async function connectToDatabase() {

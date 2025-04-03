@@ -1,8 +1,20 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+// Define TipTap editor content type
+export interface TipTapContent {
+  type: string;
+  content?: TipTapContent[];
+  text?: string;
+  attrs?: Record<string, unknown>;
+  marks?: Array<{
+    type: string;
+    attrs?: Record<string, unknown>;
+  }>;
+}
+
 export interface ArticleDocument extends Document {
   title: string;
-  content: any; // JSON content from the editor
+  content: TipTapContent; // Structured content from the editor
   coverImage?: string;
   tags: string[];
   createdAt: Date;

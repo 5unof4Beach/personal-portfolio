@@ -23,7 +23,7 @@ interface ProfileData {
 }
 
 export default function ProfileEditPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,7 +83,7 @@ export default function ProfileEditPage() {
       setProfileData({
         ...profileData,
         [section]: {
-          ...profileData[section as keyof ProfileData] as any,
+          ...profileData[section as keyof ProfileData] as Record<string, unknown>,
           [field]: value,
         },
       });
