@@ -4,21 +4,17 @@ import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/helpers/auth';
 
-// GET - Get all articles
-export async function GET(request: NextRequest) {
+// GET - Get all articles (Simplified - remove if no longer needed or adjust selection)
+export async function GET() {
   try {
     await connectToDatabase();
     
-    const searchParams = request.nextUrl.searchParams;
-    const tag = searchParams.get('tag');
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit') as string) : 10;
-    
-    const query = tag ? { tags: tag } : {};
-    
-    const articles = await Article.find(query)
+    // Simplified GET - consider if listing is still needed and what fields to return
+    // For now, returning minimal info
+    const articles = await Article.find()
       .sort({ createdAt: -1 })
-      .limit(limit)
-      .select('title tags coverImage createdAt');
+      .limit(20) // Example limit
+      .select('_id createdAt updatedAt'); // Only select minimal fields
       
     return NextResponse.json(articles);
   } catch (error) {
@@ -30,35 +26,41 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new article
+// POST - Create new content
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const session = await getServerSession(authOptions);
-    
     if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
     await connectToDatabase();
     
-    const data = await request.json();
+    // Extract only content from the body
+    const { content } = await request.json(); 
     
-    // Validate required fields
-    if (!data.title || !data.content) {
+    // Validate required content field
+    if (content === undefined || content === null) { // Check for undefined or null
       return NextResponse.json(
-        { error: 'Title and content are required' },
+        { error: 'Content is required' },
         { status: 400 }
       );
     }
     
-    const article = await Article.create(data);
+    // Create article with only the content field
+    const article = await Article.create({ content }); 
     
-    return NextResponse.json(article, { status: 201 });
+    // Return the created article (or just success status)
+    return NextResponse.json(article, { status: 201 }); 
   } catch (error) {
-    console.error('Error creating article:', error);
+    console.error('Error creating content:', error);
+    // Check for validation errors specifically
+    if (error instanceof Error && error.name === 'ValidationError') {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json(
-      { error: 'Failed to create article' },
+      { error: 'Failed to create content' },
       { status: 500 }
     );
   }

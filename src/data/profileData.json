@@ -1,0 +1,66 @@
+{
+  "name": "Duc Bui",
+  "title": "Entrepreneur and Software Business Owner",
+  "social": {
+    "github": "https://github.com/yourusername",
+    "linkedin": "https://linkedin.com/in/yourusername",
+    "twitter": "https://twitter.com/yourusername",
+    "website": "https://yourwebsite.com"
+  },
+  "about": "You want some dark-magic but legitimate softwares that solve untraditional problems ? We can help you.I own a software building team that look around for niche ideas and build them into products. We hope to solve tiny but painful problems for my customers.",
+  "skills": [
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Tailwind CSS"
+  ],
+  "projects": [
+    {
+      "title": "Sumo",
+      "description": "Sumo helps you resell software account subscriptions for many others to use with much cheaper price and without being detected for using many different devices.",
+      "technologies": [
+        "Tech A",
+        "Tech B",
+        "Tech C"
+      ],
+      "link": "#",
+      "image": "/placeholder-project.png"
+    },
+    {
+      "title": "Project Two Title",
+      "description": "Description for the second project. Explain its purpose and your role.",
+      "technologies": [
+        "Tech D",
+        "Tech E"
+      ],
+      "link": "#",
+      "image": "/placeholder-project.png"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "location": "City, Country",
+      "from": "2020-01-01",
+      "to": "2022-12-31",
+      "current": false,
+      "description": "Describe your responsibilities and achievements in this role."
+    }
+  ],
+  "education": [
+    {
+      "school": "University Name",
+      "degree": "Degree Name",
+      "fieldOfStudy": "Field of Study",
+      "from": "2016-09-01",
+      "to": "2020-05-31",
+      "current": false,
+      "description": "Mention relevant coursework, thesis, or academic achievements."
+    }
+  ],
+  "contact": {
+    "email": "ducbui.4business@gmail.com",
+    "phone": "+1234567890"
+  }
+} 

@@ -2,230 +2,170 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Image from 'next/image';
-import ArticleEditor from '@/components/ArticleEditor';
+import dynamic from 'next/dynamic';
 
-// Define TipTap editor content type
-interface TipTapContent {
-  type: string;
-  content?: TipTapContent[];
-  text?: string;
-  attrs?: Record<string, unknown>;
-  marks?: Array<{
-    type: string;
-    attrs?: Record<string, unknown>;
-  }>;
-}
+// Load MDEditor dynamically
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor"),
+  { ssr: false }
+);
 
+// Simplified Article interface
 interface Article {
-  title: string;
-  content: TipTapContent | null;
-  coverImage: string;
-  tags: string[];
+  content: string | undefined;
+  _id?: string; // Keep _id if returned by API
 }
 
-export default function EditArticlePage() {
+export default function EditMarkdownPage() { // Renamed component slightly
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
-  const isNewArticle = id === 'new';
+  const isNewContent = id === 'new'; // Renamed variable
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!isNewContent); // Only load if not new
   const [isSaving, setIsSaving] = useState(false);
+  // Simplified state
   const [article, setArticle] = useState<Article>({
-    title: '',
-    content: null,
-    coverImage: '',
-    tags: [],
+    content: undefined,
   });
-  const [tagInput, setTagInput] = useState('');
+  // Removed: tagInput state
   
   useEffect(() => {
-    if (!isNewArticle && id) {
-      fetchArticle(id);
+    if (!isNewContent && id) {
+      fetchContent(id); // Renamed function
     } else {
-      setIsLoading(false);
+      // Initialize content for new entries
+      setArticle({ content: '' }); 
+      setIsLoading(false); // Set loading false for new entries
     }
-  }, [id, isNewArticle]);
+  }, [id, isNewContent]);
   
-  async function fetchArticle(articleId: string) {
+  // Renamed and simplified fetch function
+  async function fetchContent(contentId: string) { 
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/articles/${articleId}`);
+      // Assuming API endpoint remains similar but returns only content
+      const response = await fetch(`/api/articles/${contentId}`); 
       
       if (!response.ok) {
-        throw new Error('Failed to fetch article');
+        throw new Error('Failed to fetch content');
       }
       
-      const data = await response.json();
-      setArticle(data);
+      // Expecting { content: string, _id: string } or similar
+      const data = await response.json(); 
+      setArticle({ content: data.content || '', _id: data._id }); // Update state
     } catch (error) {
-      console.error('Error fetching article:', error);
+      console.error('Error fetching content:', error);
+      setArticle({ content: `# Error loading content\n${error}` }); // Provide error feedback
     } finally {
       setIsLoading(false);
     }
   }
   
-  async function saveArticle() {
+  // Simplified save function
+  async function saveContent() { 
+    if (article.content === undefined) return; // Don't save if content isn't loaded
+
     try {
       setIsSaving(true);
       
-      const method = isNewArticle ? 'POST' : 'PATCH';
-      const url = isNewArticle ? '/api/articles' : `/api/articles/${id}`;
+      const method = isNewContent ? 'POST' : 'PATCH';
+      // Assuming API endpoints remain structurally similar
+      const url = isNewContent ? '/api/articles' : `/api/articles/${id}`; 
       
+      // Prepare only the content for saving
+      const contentToSave = { 
+        content: article.content || '', 
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(article),
+        body: JSON.stringify(contentToSave),
       });
       
       if (!response.ok) {
-        throw new Error('Failed to save article');
+        const errorData = await response.text();
+        console.error('Save error response:', errorData);
+        throw new Error(`Failed to save content (status: ${response.status})`);
       }
       
-      const savedArticle = await response.json();
+      const savedData = await response.json();
       
-      if (isNewArticle) {
-        router.push(`/admin/articles/editor/${savedArticle._id}`);
+      if (isNewContent && savedData._id) {
+        // If new content was created, redirect to its edit page
+        router.push(`/admin/articles/editor/${savedData._id}`); 
+      } else if (!isNewContent) {
+        // If editing existing, update state (in case API returns modified data)
+        setArticle(prev => ({ ...prev, content: savedData.content ?? prev.content })); 
+        // Optional: Add a success message/indicator
       }
       
-      return savedArticle;
+      return savedData;
     } catch (error) {
-      console.error('Error saving article:', error);
+      console.error('Error saving content:', error);
+      // Optional: Add user-facing error message
       return null;
     } finally {
       setIsSaving(false);
     }
   }
   
-  function handleContentChange(content: TipTapContent) {
-    setArticle({ ...article, content });
+  function handleContentChange(value: string | undefined) {
+    setArticle(prev => ({ ...prev, content: value })); // Update only content
   }
   
-  function addTag() {
-    if (tagInput.trim() && !article.tags.includes(tagInput.trim())) {
-      setArticle({
-        ...article,
-        tags: [...article.tags, tagInput.trim()],
-      });
-      setTagInput('');
-    }
-  }
+  // Removed: addTag and removeTag functions
   
-  function removeTag(tag: string) {
-    setArticle({
-      ...article,
-      tags: article.tags.filter((t) => t !== tag),
-    });
-  }
-  
-  if (isLoading) {
-    return <div className="text-center p-10">Loading...</div>;
+  if (isLoading) { // Simplified loading state
+    return <div className="text-center p-10">Loading Content...</div>;
   }
   
   return (
     <div className="max-w-5xl mx-auto p-6">
+      {/* Simplified Title */}
       <h1 className="text-3xl font-bold mb-6">
-        {isNewArticle ? 'Create New Article' : 'Edit Article'}
+        {isNewContent ? 'Create New Content' : `Edit Content (${id})`}
       </h1>
       
-      <div className="mb-6">
-        <label className="block mb-2 font-medium">Title</label>
-        <input
-          type="text"
-          value={article.title}
-          onChange={(e) => setArticle({ ...article, title: e.target.value })}
-          className="w-full p-2 border border-gray-300 rounded-md"
-          placeholder="Article title"
-          required
-        />
-      </div>
+      {/* Removed: Title Input */}
+      {/* Removed: Cover Image Input */}
+      {/* Removed: Tags Input */}
       
-      <div className="mb-6">
-        <label className="block mb-2 font-medium">Cover Image URL</label>
-        <input
-          type="text"
-          value={article.coverImage || ''}
-          onChange={(e) => setArticle({ ...article, coverImage: e.target.value })}
-          className="w-full p-2 border border-gray-300 rounded-md"
-          placeholder="https://example.com/image.jpg"
-        />
-        {article.coverImage && (
-          <div className="mt-2 relative h-40 w-full">
-            <Image
-              src={article.coverImage}
-              alt="Cover preview"
-              fill
-              style={{ objectFit: 'cover' }}
-              className="rounded-md"
+      {/* Markdown Editor Section */}
+      <div className="mb-8" data-color-mode="light"> 
+        <label className="block mb-2 font-medium">Content (Markdown)</label>
+        {article.content !== undefined ? (
+            <MDEditor
+              value={article.content}
+              onChange={handleContentChange}
+              height={500} // Increased height slightly
+              preview="live" 
             />
-          </div>
-        )}
+          ) : (
+            <div className="text-center p-10 border rounded-md h-[500px] flex items-center justify-center">Loading Editor...</div> 
+          )}
       </div>
       
-      <div className="mb-6">
-        <label className="block mb-2 font-medium">Tags</label>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addTag()}
-            className="flex-1 p-2 border border-gray-300 rounded-md"
-            placeholder="Add a tag"
-          />
-          <button
-            type="button"
-            onClick={addTag}
-            className="px-4 py-2 bg-gray-200 rounded-md"
-          >
-            Add
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {article.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 bg-gray-100 rounded-full flex items-center"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="ml-2 text-gray-500 hover:text-gray-700"
-              >
-                &times;
-              </button>
-            </span>
-          ))}
-        </div>
-      </div>
-      
-      <div className="mb-8">
-        <label className="block mb-2 font-medium">Content</label>
-        <ArticleEditor
-          content={article.content}
-          onChange={handleContentChange}
-        />
-      </div>
-      
+      {/* Simplified Action Buttons */}
       <div className="flex justify-end gap-4">
         <button
           type="button"
-          onClick={() => router.push('/admin/articles')}
+          // TODO: Decide where Cancel should go. Back to a list? Dashboard?
+          onClick={() => router.back()} // Go back to previous page for now
           className="px-4 py-2 border border-gray-300 rounded-md"
         >
           Cancel
         </button>
         <button
           type="button"
-          onClick={saveArticle}
-          disabled={isSaving}
+          onClick={saveContent} // Use updated save function
+          disabled={isSaving || article.content === undefined} 
           className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-blue-400"
         >
-          {isSaving ? 'Saving...' : 'Save Article'}
+          {isSaving ? 'Saving...' : 'Save Content'}
         </button>
       </div>
     </div>

@@ -1,9 +1,10 @@
+// This is now a Server Component
+
 import connectToDatabase from '@/lib/mongodb';
-import Article, { TipTapContent } from '@/models/Article';
+import Article from '@/models/Article';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import ArticleDisplay from '@/components/ArticleDisplay';
+import ArticleContentViewer from '@/components/ArticleContentViewer';
 
 interface ArticlePageProps {
   params: Promise<{ id: string }>
@@ -11,31 +12,30 @@ interface ArticlePageProps {
 
 interface ArticleData {
   _id: string;
-  title: string;
-  content: TipTapContent;
-  coverImage?: string;
-  tags: string[];
+  content: string;
   createdAt: string;
   updatedAt: string;
 }
 
-async function getArticle(id: string): Promise<ArticleData | null> {
+async function getContent(id: string): Promise<ArticleData | null> {
   try {
     await connectToDatabase();
-    const article = await Article.findById(id);
+    const article = await Article.findById(id).select('content createdAt updatedAt');
 
     if (!article) {
       return null;
     }
 
+    const contentString = typeof article.content === 'string' ? article.content : '';
+
     return {
-      ...article.toObject(),
       _id: article._id.toString(),
+      content: contentString,
       createdAt: article.createdAt.toISOString(),
       updatedAt: article.updatedAt.toISOString(),
     };
   } catch (error) {
-    console.error('Error fetching article:', error);
+    console.error('Error fetching content:', error);
     return null;
   }
 }
@@ -43,64 +43,34 @@ async function getArticle(id: string): Promise<ArticleData | null> {
 export default async function ArticlePage(props: ArticlePageProps) {
   const params = await props.params;
   const id = params.id;
-  const article = await getArticle(id);
+  const article = await getContent(id);
 
   if (!article) {
     notFound();
   }
 
-  const formattedDate = new Date(article.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
   return (
-    <main className="container mx-auto px-4 py-8 max-w-4xl">
-      <Link
-        href="/articles"
-        className="inline-block mb-8 text-indigo-600 hover:text-indigo-800"
-      >
-        ← Back to all articles
-      </Link>
+    <main className="bg-stone-100 min-h-screen py-12 px-4">
+      <div className="container mx-auto bg-white p-6 md:p-10 rounded-lg shadow-sm">
+        <Link
+          href="/"
+          className="inline-block mb-8 text-indigo-600 hover:text-indigo-800"
+        >
+          ← Back
+        </Link>
 
-      <article>
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
-          <div className="mb-4 text-gray-600">
-            Published on {formattedDate}
-          </div>
+        <article>
+          <ArticleContentViewer source={article.content} />
 
-          {article.tags && article.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {article.tags.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {article.coverImage && (
-            <div className="mb-8 relative w-full h-[400px]">
-              <Image
-                src={article.coverImage}
-                alt={article.title}
-                fill
-                style={{ objectFit: 'cover' }}
-                className="rounded-lg"
-              />
-            </div>
-          )}
-        </header>
-
-        <div className="article-content">
-          <ArticleDisplay content={article.content} />
-        </div>
-      </article>
+          <footer className="mt-12 pt-4 border-t border-gray-200 text-sm text-gray-500">
+            Last updated on {new Date(article.updatedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </footer>
+        </article>
+      </div>
     </main>
   );
 } 
