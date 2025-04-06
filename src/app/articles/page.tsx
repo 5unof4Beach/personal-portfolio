@@ -1,7 +1,7 @@
 import connectToDatabase from '@/lib/mongodb';
 import Article from '@/models/Article';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from 'next/image'
 
 interface ArticlePreview {
   _id: string;

@@ -3,79 +3,90 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-
+import Image from 'next/image'
 // Load MDEditor dynamically
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
   { ssr: false }
 );
 
-// Simplified Article interface
+// Updated Article interface to include previous fields
 interface Article {
+  _id?: string; 
+  title: string;
   content: string | undefined;
-  _id?: string; // Keep _id if returned by API
+  coverImage?: string;
+  tags: string[];
 }
 
-export default function EditMarkdownPage() { // Renamed component slightly
+export default function EditArticlePage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
-  const isNewContent = id === 'new'; // Renamed variable
+  const isNewArticle = id === 'new';
   
-  const [isLoading, setIsLoading] = useState(!isNewContent); // Only load if not new
+  const [isLoading, setIsLoading] = useState(!isNewArticle);
   const [isSaving, setIsSaving] = useState(false);
-  // Simplified state
   const [article, setArticle] = useState<Article>({
+    title: '',
     content: undefined,
+    coverImage: '',
+    tags: [],
   });
-  // Removed: tagInput state
+  const [tagInput, setTagInput] = useState('');
   
   useEffect(() => {
-    if (!isNewContent && id) {
-      fetchContent(id); // Renamed function
+    if (!isNewArticle && id) {
+      fetchArticle(id);
     } else {
-      // Initialize content for new entries
-      setArticle({ content: '' }); 
-      setIsLoading(false); // Set loading false for new entries
+      setArticle(prev => ({ ...prev, content: '' }));
+      setIsLoading(false);
     }
-  }, [id, isNewContent]);
+  }, [id, isNewArticle]);
   
-  // Renamed and simplified fetch function
-  async function fetchContent(contentId: string) { 
+  async function fetchArticle(articleId: string) { 
     try {
       setIsLoading(true);
-      // Assuming API endpoint remains similar but returns only content
-      const response = await fetch(`/api/articles/${contentId}`); 
+      const response = await fetch(`/api/articles/${articleId}`); 
       
       if (!response.ok) {
-        throw new Error('Failed to fetch content');
+        throw new Error('Failed to fetch article');
       }
       
-      // Expecting { content: string, _id: string } or similar
-      const data = await response.json(); 
-      setArticle({ content: data.content || '', _id: data._id }); // Update state
+      const data = await response.json();
+      setArticle({
+        _id: data._id,
+        title: data.title || '',
+        content: data.content || '',
+        coverImage: data.coverImage || '',
+        tags: data.tags || [],
+      });
     } catch (error) {
-      console.error('Error fetching content:', error);
-      setArticle({ content: `# Error loading content\n${error}` }); // Provide error feedback
+      console.error('Error fetching article:', error);
+      setArticle(prev => ({ 
+        ...prev, 
+        title: 'Error Loading',
+        content: `# Error loading content\n${error}` 
+      })); 
     } finally {
       setIsLoading(false);
     }
   }
   
-  // Simplified save function
-  async function saveContent() { 
-    if (article.content === undefined) return; // Don't save if content isn't loaded
+  async function saveArticle() { 
+    if (article.content === undefined) return;
 
     try {
       setIsSaving(true);
       
-      const method = isNewContent ? 'POST' : 'PATCH';
-      // Assuming API endpoints remain structurally similar
-      const url = isNewContent ? '/api/articles' : `/api/articles/${id}`; 
+      const method = isNewArticle ? 'POST' : 'PATCH';
+      const url = isNewArticle ? '/api/articles' : `/api/articles/${id}`;
       
-      // Prepare only the content for saving
-      const contentToSave = { 
+      const articleToSave = { 
+        title: article.title,
         content: article.content || '', 
+        coverImage: article.coverImage || null,
+        tags: article.tags,
       };
 
       const response = await fetch(url, {
@@ -83,30 +94,35 @@ export default function EditMarkdownPage() { // Renamed component slightly
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(contentToSave),
+        body: JSON.stringify(articleToSave),
       });
       
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Save error response:', errorData);
-        throw new Error(`Failed to save content (status: ${response.status})`);
+        throw new Error(`Failed to save article (status: ${response.status})`);
       }
       
       const savedData = await response.json();
       
-      if (isNewContent && savedData._id) {
-        // If new content was created, redirect to its edit page
+      if (isNewArticle && savedData._id) {
         router.push(`/admin/articles/editor/${savedData._id}`); 
-      } else if (!isNewContent) {
-        // If editing existing, update state (in case API returns modified data)
-        setArticle(prev => ({ ...prev, content: savedData.content ?? prev.content })); 
-        // Optional: Add a success message/indicator
+      } else if (!isNewArticle) {
+        setArticle(prev => ({ 
+          ...prev, 
+          _id: savedData._id ?? prev._id, 
+          title: savedData.title ?? prev.title,
+          content: savedData.content ?? prev.content,
+          coverImage: savedData.coverImage ?? prev.coverImage,
+          tags: savedData.tags ?? prev.tags,
+        })); 
+        alert('Article saved successfully!');
       }
       
       return savedData;
     } catch (error) {
-      console.error('Error saving content:', error);
-      // Optional: Add user-facing error message
+      console.error('Error saving article:', error);
+      alert(`Error saving article: ${error}`);
       return null;
     } finally {
       setIsSaving(false);
@@ -114,34 +130,130 @@ export default function EditMarkdownPage() { // Renamed component slightly
   }
   
   function handleContentChange(value: string | undefined) {
-    setArticle(prev => ({ ...prev, content: value })); // Update only content
+    setArticle(prev => ({ ...prev, content: value }));
+  }
+
+  function addTag() {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !article.tags.includes(trimmedTag)) {
+      setArticle({
+        ...article,
+        tags: [...article.tags, trimmedTag],
+      });
+      setTagInput('');
+    }
   }
   
-  // Removed: addTag and removeTag functions
+  function removeTag(tagToRemove: string) {
+    setArticle({
+      ...article,
+      tags: article.tags.filter((tag) => tag !== tagToRemove),
+    });
+  }
   
-  if (isLoading) { // Simplified loading state
-    return <div className="text-center p-10">Loading Content...</div>;
+  if (isLoading) { 
+    return <div className="text-center p-10">Loading Article...</div>;
   }
   
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      {/* Simplified Title */}
-      <h1 className="text-3xl font-bold mb-6">
-        {isNewContent ? 'Create New Content' : `Edit Content (${id})`}
+    <div className="max-w-5xl mx-auto p-6"> 
+      <h1 className="text-3xl font-bold mb-6"> 
+        {isNewArticle ? 'Create New Article' : `Edit Article`}
       </h1>
       
-      {/* Removed: Title Input */}
-      {/* Removed: Cover Image Input */}
-      {/* Removed: Tags Input */}
+      <div className="mb-6">
+        <label htmlFor="title" className="block mb-2 font-medium">Title</label>
+        <input
+          id="title"
+          type="text"
+          value={article.title}
+          onChange={(e) => setArticle({ ...article, title: e.target.value })}
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="Article title"
+          required
+        />
+      </div>
+
+      <div className="mb-6">
+        <label htmlFor="coverImage" className="block mb-2 font-medium">Cover Image URL</label>
+        <input
+          id="coverImage"
+          type="text"
+          value={article.coverImage || ''}
+          onChange={(e) => setArticle(prev => ({ ...prev, coverImage: e.target.value }))}
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="https://example.com/image.jpg"
+        />
+        {article.coverImage && (
+          <div className="mt-2 relative h-40 w-full border rounded-md overflow-hidden">
+            <Image
+              src={article.coverImage}
+              alt="Cover preview"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="mb-6">
+        <label className="block mb-2 font-medium">Tags</label>
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+              }
+            }}
+            className="flex-1 p-2 border border-gray-300 rounded-md"
+            placeholder="Add a tag and press Enter"
+          />
+          <button
+            type="button"
+            onClick={addTag}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          >
+            Add Tag
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2 min-h-[2.5rem] items-center">
+          {article.tags.length > 0 ? (
+            article.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-1.5"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="text-gray-500 hover:text-gray-800 text-xs font-bold"
+                  aria-label={`Remove tag ${tag}`}
+                >
+                  &times;
+                </button>
+              </span>
+            ))
+            ) : (
+              <p className="text-sm text-gray-500">No tags added yet.</p>
+            )
+          }
+        </div>
+      </div>
       
-      {/* Markdown Editor Section */}
       <div className="mb-8" data-color-mode="light"> 
-        <label className="block mb-2 font-medium">Content (Markdown)</label>
+        <label htmlFor="content-editor" className="block mb-2 font-medium">Content (Markdown)</label>
         {article.content !== undefined ? (
             <MDEditor
+              id="content-editor"
               value={article.content}
               onChange={handleContentChange}
-              height={500} // Increased height slightly
+              height={500}
               preview="live" 
             />
           ) : (
@@ -149,23 +261,21 @@ export default function EditMarkdownPage() { // Renamed component slightly
           )}
       </div>
       
-      {/* Simplified Action Buttons */}
-      <div className="flex justify-end gap-4">
+      <div className="flex justify-end gap-4"> 
         <button
           type="button"
-          // TODO: Decide where Cancel should go. Back to a list? Dashboard?
-          onClick={() => router.back()} // Go back to previous page for now
+          onClick={() => router.back()}
           className="px-4 py-2 border border-gray-300 rounded-md"
         >
           Cancel
         </button>
         <button
           type="button"
-          onClick={saveContent} // Use updated save function
+          onClick={saveArticle}
           disabled={isSaving || article.content === undefined} 
           className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-blue-400"
         >
-          {isSaving ? 'Saving...' : 'Save Content'}
+          {isSaving ? 'Saving...' : 'Save Article'}
         </button>
       </div>
     </div>

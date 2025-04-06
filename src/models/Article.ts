@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 // Simplified ArticleDocument interface
 export interface ArticleDocument extends Document {
   content: string; // Changed to simple string
-  title?: string; // Made optional
+  title: string; // Changed back to required
   coverImage?: string; // Already optional
   tags?: string[]; // Made optional
   createdAt: Date;
@@ -17,10 +17,10 @@ const ArticleSchema = new Schema<ArticleDocument>(
       type: String, 
       required: [true, 'Please provide content'],
     },
-    // Made title optional
+    // Make title required again
     title: {
       type: String,
-      required: false, // No longer required
+      required: [true, 'Please provide a title'], // Re-added required validation
       trim: true,
       maxlength: [100, 'Title cannot be more than 100 characters'],
     },

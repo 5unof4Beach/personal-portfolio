@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+// Updated interface to include fields returned by API
 interface Article {
   _id: string;
   title: string;
@@ -15,7 +16,8 @@ interface Article {
 
 export default function ArticlesListPage() {
   const router = useRouter();
-  const [articles, setArticles] = useState<Article[]>([]);
+  // Use the updated interface
+  const [articles, setArticles] = useState<Article[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
@@ -24,15 +26,14 @@ export default function ArticlesListPage() {
     fetchArticles();
   }, []);
   
+  // Fetch function expects array of Article objects now
   async function fetchArticles() {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/articles');
-      
+      const response = await fetch('/api/articles'); 
       if (!response.ok) {
         throw new Error('Failed to fetch articles');
       }
-      
       const data = await response.json();
       setArticles(data);
     } catch (error) {
@@ -42,20 +43,15 @@ export default function ArticlesListPage() {
     }
   }
   
+  // Delete function remains the same
   async function deleteArticle(id: string) {
     try {
       setIsDeleting(true);
       setSelectedArticle(id);
-      
-      const response = await fetch(`/api/articles/${id}`, {
-        method: 'DELETE',
-      });
-      
+      const response = await fetch(`/api/articles/${id}`, { method: 'DELETE' });
       if (!response.ok) {
         throw new Error('Failed to delete article');
       }
-      
-      // Remove the article from the local state
       setArticles(articles.filter((article) => article._id !== id));
     } catch (error) {
       console.error('Error deleting article:', error);
@@ -65,6 +61,7 @@ export default function ArticlesListPage() {
     }
   }
   
+  // Simplified formatDate back if hour/minute not needed here
   function formatDate(dateString: string) {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -75,30 +72,32 @@ export default function ArticlesListPage() {
   }
   
   if (isLoading) {
-    return <div className="text-center p-10">Loading articles...</div>;
+    return <div className="text-center p-10">Loading articles...</div>; // Updated text
   }
   
   return (
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Articles</h1>
+        <h1 className="text-3xl font-bold">Articles</h1> {/* Reverted Title */} 
         <Link
           href="/admin/articles/editor/new"
           className="px-4 py-2 bg-blue-600 text-white rounded-md"
         >
-          Create New Article
+          Create New Article {/* Reverted Button Text */} 
         </Link>
       </div>
       
       {articles.length === 0 ? (
         <div className="text-center p-10 bg-gray-50 rounded-lg">
-          <p>No articles yet. Create your first article!</p>
+          <p>No articles yet. Create your first article!</p> {/* Reverted Text */} 
         </div>
       ) : (
+        // Restore Table View
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                {/* Add Cover Image column header (implicitly with Title) */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
@@ -116,6 +115,7 @@ export default function ArticlesListPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {articles.map((article) => (
                 <tr key={article._id} className="hover:bg-gray-50">
+                  {/* Title and Cover Image Column */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {article.coverImage && (
@@ -123,8 +123,8 @@ export default function ArticlesListPage() {
                           <Image
                             src={article.coverImage}
                             alt=""
-                            fill
                             sizes="40px"
+                            fill
                             className="rounded-full object-cover"
                           />
                         </div>
@@ -136,6 +136,7 @@ export default function ArticlesListPage() {
                       </div>
                     </div>
                   </td>
+                  {/* Tags Column */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
                       {article.tags.map((tag) => (
@@ -148,9 +149,11 @@ export default function ArticlesListPage() {
                       ))}
                     </div>
                   </td>
+                  {/* Date Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(article.createdAt)}
                   </td>
+                  {/* Actions Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => router.push(`/admin/articles/editor/${article._id}`)}

@@ -5,14 +5,13 @@ const nextConfig = {
   
   // Configure allowed image domains
   images: {
-    domains: [
-      'perfectpetinsurance.co.uk',
-      'images.unsplash.com',
-      'placekitten.com',
-      'placehold.co',
-      'picsum.photos',
-      'via.placeholder.com',
-      'example.com'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+        port: '',
+        pathname: '**',
+      },
     ],
   }
 };
