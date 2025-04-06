@@ -42,29 +42,9 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <DashboardCard
-            title="Edit Profile"
-            description="Update your personal information, skills, and about section"
-            link="/admin/profile"
-          />
-          <DashboardCard
-            title="Manage Experience"
-            description="Add, edit, or remove work experience entries"
-            link="/admin/experience"
-          />
-          <DashboardCard
-            title="Manage Education"
-            description="Add, edit, or remove education details"
-            link="/admin/education"
-          />
-          <DashboardCard
-            title="Manage Projects"
-            description="Add, edit, or remove portfolio projects"
-            link="/admin/projects"
-          />
-          <DashboardCard
-            title="Social Links"
+            title="Manage Articles"
             description="Update your social media links and contact information"
-            link="/admin/social"
+            link="/admin/articles"
           />
           <DashboardCard
             title="View Portfolio"

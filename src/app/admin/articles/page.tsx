@@ -142,7 +142,7 @@ export default function ArticlesListPage() {
                       {article.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-1 text-xs bg-gray-100 rounded-full"
+                          className="px-2 py-1 text-xs bg-gray-100 rounded-full text-gray-800"
                         >
                           {tag}
                         </span>
@@ -155,6 +155,13 @@ export default function ArticlesListPage() {
                   </td>
                   {/* Actions Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <Link
+                      href= {`/articles/${article._id}`}
+                      className="text-gray-800 hover:text-indigo-900 mr-4"
+                      target='_blank'
+                    >
+                      View
+                    </Link>
                     <button
                       onClick={() => router.push(`/admin/articles/editor/${article._id}`)}
                       className="text-indigo-600 hover:text-indigo-900 mr-4"

@@ -1,9 +1,7 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 import profileData from '@/data/profileData.json'; // Import data from JSON
 
-// Helper function to format date ranges
 const formatDateRange = (from: string, to: string | null, current: boolean): string => {
   const fromYear = new Date(from).getFullYear();
   if (current) {
@@ -224,16 +222,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-stone-900 py-6 text-stone-400">
-        <div className="container mx-auto px-6 text-center text-sm">
-          <p>© {new Date().getFullYear()} {profileData.name}. All rights reserved.</p>
-          <Link href="/articles" className="mt-2 inline-block text-xs text-stone-500 hover:text-stone-300 transition duration-300">
-            Blogs
-          </Link>
-        </div>
-      </footer>
     </main>
   );
 }

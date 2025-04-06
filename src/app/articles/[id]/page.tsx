@@ -1,9 +1,6 @@
-// This is now a Server Component
-
 import connectToDatabase from '@/lib/mongodb';
 import Article from '@/models/Article';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import ArticleContentViewer from '@/components/ArticleContentViewer';
 
 interface ArticlePageProps {
@@ -50,27 +47,23 @@ export default async function ArticlePage(props: ArticlePageProps) {
   }
 
   return (
-    <main className="bg-stone-100 min-h-screen py-12 px-4">
-      <div className="container mx-auto bg-white p-6 md:p-10 rounded-lg shadow-sm">
-        <Link
-          href="/"
-          className="inline-block mb-8 text-indigo-600 hover:text-indigo-800"
-        >
-          ← Back
-        </Link>
+    <>
+      <main className="bg-stone-100 min-h-screen py-12 px-4">
+        <div className="container mx-auto bg-white p-6 md:p-10 rounded-lg shadow-sm">
 
-        <article>
-          <ArticleContentViewer source={article.content} />
+          <article>
+            <ArticleContentViewer source={article.content} />
 
-          <footer className="mt-12 pt-4 border-t border-gray-200 text-sm text-gray-500">
-            Last updated on {new Date(article.updatedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </footer>
-        </article>
-      </div>
-    </main>
+            <footer className="mt-12 pt-4 border-t border-gray-200 text-sm text-gray-500">
+              Last updated on {new Date(article.updatedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </footer>
+          </article>
+        </div>
+      </main>
+    </>
   );
 } 

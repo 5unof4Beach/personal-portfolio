@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image'
-// Load MDEditor dynamically
+
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
   { ssr: false }
@@ -185,13 +185,12 @@ export default function EditArticlePage() {
           placeholder="https://example.com/image.jpg"
         />
         {article.coverImage && (
-          <div className="mt-2 relative h-40 w-full border rounded-md overflow-hidden">
+          <div className="mt-2 relative h-40 border rounded-md overflow-hidden">
             <Image
               src={article.coverImage}
               alt="Cover preview"
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'contain' }}
             />
           </div>
         )}
@@ -226,7 +225,7 @@ export default function EditArticlePage() {
             article.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-1.5"
+                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-1.5 text-gray-800"
               >
                 {tag}
                 <button
