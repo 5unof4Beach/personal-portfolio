@@ -4,6 +4,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ArticleDocument extends Document {
   content: string; // Changed to simple string
   title: string; // Changed back to required
+  description: string; // Brief description/summary of the article
   coverImage?: string; // Already optional
   tags?: string[]; // Made optional
   createdAt: Date;
@@ -23,6 +24,13 @@ const ArticleSchema = new Schema<ArticleDocument>(
       required: [true, 'Please provide a title'], // Re-added required validation
       trim: true,
       maxlength: [100, 'Title cannot be more than 100 characters'],
+    },
+    // Add description field
+    description: {
+      type: String,
+      required: [true, 'Please provide a description'],
+      trim: true,
+      maxlength: [300, 'Description cannot be more than 300 characters'],
     },
     // coverImage remains optional
     coverImage: {

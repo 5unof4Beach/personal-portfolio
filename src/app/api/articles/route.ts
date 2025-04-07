@@ -13,7 +13,7 @@ export async function GET() {
     const articles = await Article.find()
       .sort({ createdAt: -1 })
       .limit(20) // Keep limit or adjust as needed
-      .select('title tags coverImage createdAt'); // Select fields for preview
+      .select('title description tags coverImage createdAt'); // Select fields for preview
       
     return NextResponse.json(articles);
   } catch (error) {
@@ -38,12 +38,12 @@ export async function POST(request: NextRequest) {
     
     // Extract all expected fields from the body
     const data = await request.json(); 
-    const { title, content, coverImage, tags } = data;
+    const { title, content, description, coverImage, tags } = data;
     
-    // Validate required fields: title and content
-    if (!title || content === undefined || content === null) { 
+    // Validate required fields: title, content, and description
+    if (!title || content === undefined || content === null || !description) { 
       return NextResponse.json(
-        { error: 'Title and Content are required' },
+        { error: 'Title, Content, and Description are required' },
         { status: 400 }
       );
     }
@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
     const articleData = { 
       title,
       content,
+      description,
       coverImage: coverImage || null, // Use null if empty/undefined
       tags: tags || [], // Use empty array if empty/undefined
     };

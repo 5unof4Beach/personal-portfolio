@@ -65,7 +65,7 @@ export async function PATCH(
     
     // Extract all fields from the body
     const data = await request.json(); 
-    const { title, content, coverImage, tags } = data;
+    const { title, content, coverImage, tags, description } = data;
 
     // Optional: Add validation here if needed (e.g., ensure title is not empty if provided)
     if (title !== undefined && !title) {
@@ -82,6 +82,7 @@ export async function PATCH(
     // Allow setting coverImage to null or empty string to remove it
     if (coverImage !== undefined) updateData.coverImage = coverImage || null;
     if (tags !== undefined) updateData.tags = tags;
+    if (description !== undefined) updateData.description = description;
 
     // Check if there's anything to update
     if (Object.keys(updateData).length === 0) {

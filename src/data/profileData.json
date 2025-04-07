@@ -2,40 +2,18 @@
   "name": "Duc Bui",
   "title": "Entrepreneur and Software Business Owner",
   "social": {
-    "github": "https://github.com/yourusername",
-    "linkedin": "https://linkedin.com/in/yourusername",
-    "twitter": "https://twitter.com/yourusername",
-    "website": "https://yourwebsite.com"
+    "github": "https://github.com/5unof4Beach",
+    "linkedin": "https://linkedin.com/in/duc-bui-5572a9325/",
+    "twitter": "https://twitter.com/ducbman"
   },
-  "about": "You want some dark-magic but legitimate softwares that solve untraditional problems ? We can help you.I own a software building team that look around for niche ideas and build them into products. We hope to solve tiny but painful problems for my customers.",
+  "about": "You want some dark-magic but legitimate softwares that solve untraditional problems? We can help you out. I own a software building team that look around for niche ideas and build them into products. We hope to solve tiny but itchy problems for my customers.",
   "skills": [
-    "TypeScript",
-    "React",
-    "Next.js",
-    "Tailwind CSS"
-  ],
-  "projects": [
-    {
-      "title": "Sumo",
-      "description": "Sumo helps you resell software account subscriptions for many others to use with much cheaper price and without being detected for using many different devices.",
-      "technologies": [
-        "Tech A",
-        "Tech B",
-        "Tech C"
-      ],
-      "link": "#",
-      "image": "/placeholder-project.png"
-    },
-    {
-      "title": "Project Two Title",
-      "description": "Description for the second project. Explain its purpose and your role.",
-      "technologies": [
-        "Tech D",
-        "Tech E"
-      ],
-      "link": "#",
-      "image": "/placeholder-project.png"
-    }
+    "Web Development",
+    "App Development",
+    "Backend Development",
+    "DevOps",
+    "Infrastructure",
+    "Project Management"
   ],
   "experience": [
     {

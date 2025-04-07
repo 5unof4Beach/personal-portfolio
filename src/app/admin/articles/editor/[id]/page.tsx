@@ -14,6 +14,7 @@ const MDEditor = dynamic(
 interface Article {
   _id?: string; 
   title: string;
+  description: string;
   content: string | undefined;
   coverImage?: string;
   tags: string[];
@@ -29,6 +30,7 @@ export default function EditArticlePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [article, setArticle] = useState<Article>({
     title: '',
+    description: '',
     content: undefined,
     coverImage: '',
     tags: [],
@@ -57,6 +59,7 @@ export default function EditArticlePage() {
       setArticle({
         _id: data._id,
         title: data.title || '',
+        description: data.description || '',
         content: data.content || '',
         coverImage: data.coverImage || '',
         tags: data.tags || [],
@@ -84,6 +87,7 @@ export default function EditArticlePage() {
       
       const articleToSave = { 
         title: article.title,
+        description: article.description,
         content: article.content || '', 
         coverImage: article.coverImage || null,
         tags: article.tags,
@@ -112,6 +116,7 @@ export default function EditArticlePage() {
           ...prev, 
           _id: savedData._id ?? prev._id, 
           title: savedData.title ?? prev.title,
+          description: savedData.description ?? prev.description,
           content: savedData.content ?? prev.content,
           coverImage: savedData.coverImage ?? prev.coverImage,
           tags: savedData.tags ?? prev.tags,
@@ -170,6 +175,20 @@ export default function EditArticlePage() {
           onChange={(e) => setArticle({ ...article, title: e.target.value })}
           className="w-full p-2 border border-gray-300 rounded-md"
           placeholder="Article title"
+          required
+        />
+      </div>
+
+      <div className="mb-6">
+        <label htmlFor="description" className="block mb-2 font-medium">Description</label>
+        <textarea
+          id="description"
+          value={article.description}
+          onChange={(e) => setArticle({ ...article, description: e.target.value })}
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="Brief description of the article (max 300 characters)"
+          maxLength={300}
+          rows={3}
           required
         />
       </div>
