@@ -3,6 +3,7 @@ import Article from "@/models/Article";
 import Link from "next/link";
 import Image from "next/image";
 import ArticleTagsSidebar from "@/components/ArticleTagsSidebar";
+import { unstable_cache } from 'next/cache';
 
 interface ArticlePreview {
   _id: string;
@@ -12,7 +13,7 @@ interface ArticlePreview {
   createdAt: string;
 }
 
-async function getArticles(): Promise<ArticlePreview[]> {
+async function fetchArticlesFromDb(): Promise<ArticlePreview[]> {
   try {
     await connectToDatabase();
     const articles = await Article.find({})
@@ -31,6 +32,12 @@ async function getArticles(): Promise<ArticlePreview[]> {
     return [];
   }
 }
+
+const getArticles = unstable_cache(
+  async () => fetchArticlesFromDb(),
+  ['articles-list'],
+  { revalidate: 300 }
+)
 
 export default async function ArticlesPage() {
   const articles = await getArticles();

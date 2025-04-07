@@ -2,6 +2,7 @@ import connectToDatabase from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { notFound } from "next/navigation";
 import ArticleContentViewer from "@/components/ArticleContentViewer";
+import { unstable_cache } from "next/cache";
 
 interface ArticlePageProps {
   params: Promise<{ id: string }>;
@@ -16,12 +17,10 @@ interface ArticleData {
   updatedAt: string;
 }
 
-async function getContent(id: string): Promise<ArticleData | null> {
+async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
   try {
     await connectToDatabase();
-    const article = await Article.findById(id).select(
-      "content title coverImage createdAt updatedAt"
-    );
+    const article = await Article.findById(id);
 
     if (!article) {
       return null;
@@ -43,6 +42,12 @@ async function getContent(id: string): Promise<ArticleData | null> {
     return null;
   }
 }
+
+const getContent = unstable_cache(
+  async (articleId: string) => fetchArticleFromDb(articleId),
+  ["article-detail"],
+  { revalidate: 600 }
+);
 
 export default async function ArticlePage(props: ArticlePageProps) {
   const params = await props.params;

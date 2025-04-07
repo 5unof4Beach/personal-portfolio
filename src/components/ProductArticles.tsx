@@ -1,8 +1,8 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_cache } from 'next/cache';
+import connectToDatabase from "@/lib/mongodb";
+import Article from "@/models/Article";
 
 interface Article {
   _id: string;
@@ -13,46 +13,37 @@ interface Article {
   createdAt: string;
 }
 
-export default function ProductArticles() {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+async function fetchArticlesFromDb(): Promise<Article[]> {
+  try {
+    await connectToDatabase();
+    const articles = await Article.find({})
+      .sort({ createdAt: -1 })
+      .select("title description coverImage tags createdAt");
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
-
-  async function fetchArticles() {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/articles");
-      if (!response.ok) {
-        throw new Error("Failed to fetch articles");
-      }
-      const data = await response.json();
-      // Filter articles with "product" tag
-      const productArticles = data.filter((article: Article) =>
-        article.tags.includes("product")
-      );
-      setArticles(productArticles);
-    } catch (error) {
-      console.error("Error fetching articles:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    return articles.map((article) => ({
+      _id: article._id.toString(),
+      title: article.title,
+      description: article.description,
+      coverImage: article.coverImage,
+      tags: article.tags,
+      createdAt: article.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    return [];
   }
+}
 
-  if (isLoading) {
-    return (
-      <section id="products" className="py-16 md:py-20">
-        <div className="container mx-auto px-6">
-          <h2 className="mb-10 text-center text-3xl font-semibold text-gray-800">
-            Products
-          </h2>
-          <div className="text-center">Loading products...</div>
-        </div>
-      </section>
-    );
-  }
+const getArticles = unstable_cache(
+  async () => fetchArticlesFromDb(),
+  ['articles-list'],
+  { revalidate: 300 }
+)
+
+export default async function ProductArticles() {
+  const articles = await getArticles();
+
+
 
   if (articles.length === 0) {
     return null;

@@ -12,9 +12,8 @@ export async function GET() {
     // Fetch articles with fields needed for the list page
     const articles = await Article.find()
       .sort({ createdAt: -1 })
-      .limit(20) // Keep limit or adjust as needed
-      .select('title description tags coverImage createdAt'); // Select fields for preview
-      
+      .select('title description tags coverImage createdAt');
+    
     return NextResponse.json(articles);
   } catch (error) {
     console.error('Error fetching articles:', error);
