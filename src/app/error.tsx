@@ -25,7 +25,7 @@ export default function Error({
         <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <button
             onClick={reset}
-            className="rounded-md bg-indigo-600 px-6 py-3 text-white hover:bg-indigo-700"
+            className="rounded-md bg-gray-600 px-6 py-3 text-white hover:bg-gray-700"
           >
             Try again
           </button>

@@ -3,6 +3,7 @@ import "./globals.css";
 import Footer from '@/components/Footer';
 import Header from "@/components/Header";
 import { inter } from './fonts';
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: "Duc Bui - Software",
@@ -24,8 +25,9 @@ export default function RootLayout({
         className={`${inter.className} antialiased flex flex-col min-h-screen`}
       >
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow bg-white">
           {children}
+          <Analytics />
         </main>
         <Footer />
       </body>

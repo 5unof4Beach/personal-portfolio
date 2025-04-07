@@ -141,7 +141,7 @@ export default function ProfileEditPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600"></div>
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-gray-600"></div>
       </div>
     );
   }
@@ -190,7 +190,7 @@ export default function ProfileEditPage() {
                   name="name"
                   value={profileData.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                   required
                 />
               </div>
@@ -204,7 +204,7 @@ export default function ProfileEditPage() {
                   name="title"
                   value={profileData.title}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                   required
                 />
               </div>
@@ -224,7 +224,7 @@ export default function ProfileEditPage() {
                 value={profileData.about}
                 onChange={handleInputChange}
                 rows={6}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 required
               />
             </div>
@@ -241,12 +241,12 @@ export default function ProfileEditPage() {
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
                   placeholder="Add a skill"
-                  className="block w-full rounded-l-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="block w-full rounded-l-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
                 <button
                   type="button"
                   onClick={handleAddSkill}
-                  className="rounded-r-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+                  className="rounded-r-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
                 >
                   Add
                 </button>
@@ -257,13 +257,13 @@ export default function ProfileEditPage() {
               {profileData.skills.map((skill, index) => (
                 <div
                   key={index}
-                  className="flex items-center rounded-full bg-indigo-100 px-3 py-1"
+                  className="flex items-center rounded-full bg-gray-100 px-3 py-1"
                 >
-                  <span className="mr-1 text-sm text-indigo-800">{skill}</span>
+                  <span className="mr-1 text-sm text-gray-800">{skill}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveSkill(index)}
-                    className="ml-1 text-indigo-600 hover:text-indigo-800"
+                    className="ml-1 text-gray-600 hover:text-gray-800"
                   >
                     &times;
                   </button>
@@ -286,7 +286,7 @@ export default function ProfileEditPage() {
                   name="contact.email"
                   value={profileData.contact.email}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               
@@ -299,7 +299,7 @@ export default function ProfileEditPage() {
                   name="contact.phone"
                   value={profileData.contact.phone}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function ProfileEditPage() {
                   name="social.linkedin"
                   value={profileData.social.linkedin}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               
@@ -332,7 +332,7 @@ export default function ProfileEditPage() {
                   name="social.github"
                   value={profileData.social.github}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               
@@ -345,7 +345,7 @@ export default function ProfileEditPage() {
                   name="social.twitter"
                   value={profileData.social.twitter}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               
@@ -358,7 +358,7 @@ export default function ProfileEditPage() {
                   name="social.website"
                   value={profileData.social.website}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
             </div>
@@ -369,7 +369,7 @@ export default function ProfileEditPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="rounded-md bg-indigo-600 px-6 py-3 text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="rounded-md bg-gray-600 px-6 py-3 text-white hover:bg-gray-700 disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
