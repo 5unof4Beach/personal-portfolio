@@ -126,7 +126,7 @@ export default function EditArticlePage() {
         })); 
         alert('Article saved successfully!');
       }
-      
+
       return savedData;
     } catch (error) {
       console.error('Error saving article:', error);

@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/helpers/auth';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get all articles (Return necessary fields for preview)
 export async function GET() {
@@ -12,9 +13,8 @@ export async function GET() {
     // Fetch articles with fields needed for the list page
     const articles = await Article.find()
       .sort({ createdAt: -1 })
-      .limit(20) // Keep limit or adjust as needed
-      .select('title description tags coverImage createdAt'); // Select fields for preview
-      
+      .select('title description tags coverImage createdAt');
+    
     return NextResponse.json(articles);
   } catch (error) {
     console.error('Error fetching articles:', error);
@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
     };
 
     const article = await Article.create(articleData); 
+
+    revalidateTag("articles-list");
     
     return NextResponse.json(article, { status: 201 }); 
   } catch (error) {

@@ -4,6 +4,7 @@ import Article from '@/models/Article';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/helpers/auth';
 import mongoose from 'mongoose';
+import { revalidateTag } from 'next/cache';
 
 // GET - Get a single article by ID (Adjust selection as needed)
 export async function GET(
@@ -104,6 +105,9 @@ export async function PATCH(
       );
     }
     
+    revalidateTag(`article-detail-${id}`);
+    revalidateTag("articles-list");
+
     return NextResponse.json(article); 
   } catch (error) {
     console.error('Error updating article:', error);
@@ -147,6 +151,9 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    revalidateTag(`article-detail-${id}`);
+    revalidateTag("articles-list");
     
     return NextResponse.json({ success: true, message: `Content ${id} deleted` });
   } catch (error) {

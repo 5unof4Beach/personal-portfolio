@@ -1,16 +1,20 @@
-'use client'; // This component runs on the client
+'use client';
 
-import MarkdownPreview from '@uiw/react-markdown-preview';
+import dynamic from 'next/dynamic';
+
+const MDViewer = dynamic(
+  () => import("@uiw/react-markdown-preview"),
+  { ssr: true }
+);
 
 interface ArticleContentViewerProps {
-  source: string; // Expect the markdown string as a prop
+  source: string;
 }
 
 export default function ArticleContentViewer({ source }: ArticleContentViewerProps) {
-  // Wrap the component and apply data-color-mode to the wrapper
   return (
     <div data-color-mode="light">
-      <MarkdownPreview source={source} />
+      <MDViewer source={source} />
     </div>
   );
 } 

@@ -1,36 +1,7 @@
-import connectToDatabase from "@/lib/mongodb";
-import Article from "@/models/Article";
 import Link from "next/link";
 import Image from "next/image";
 import ArticleTagsSidebar from "@/components/ArticleTagsSidebar";
-
-interface ArticlePreview {
-  _id: string;
-  title: string;
-  coverImage?: string;
-  tags: string[];
-  createdAt: string;
-}
-
-async function getArticles(): Promise<ArticlePreview[]> {
-  try {
-    await connectToDatabase();
-    const articles = await Article.find({})
-      .sort({ createdAt: -1 })
-      .select("title tags coverImage createdAt");
-
-    return articles.map((article) => ({
-      _id: article._id.toString(),
-      title: article.title,
-      coverImage: article.coverImage,
-      tags: article.tags,
-      createdAt: article.createdAt.toISOString(),
-    }));
-  } catch (error) {
-    console.error("Error fetching articles:", error);
-    return [];
-  }
-}
+import getArticles from "@/utils/getArticlesWithCache";
 
 export default async function ArticlesPage() {
   const articles = await getArticles();
