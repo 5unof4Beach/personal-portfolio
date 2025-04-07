@@ -58,9 +58,17 @@ export default async function ArticlePage(props: ArticlePageProps) {
       <main className="bg-stone-100 min-h-screen  py-12 px-4 bg-white">
         <div className="container mx-auto bg-white p-6 md:p-10 rounded-lg">
           <article>
-          <h1 className="text-2xl font-semibold text-gray-900 group-hover:text-gray-600 transition-colors duration-200 mb-4">
-            {article.title}
-          </h1>
+            <h1 className="text-4xl font-bold text-gray-900">
+              {article.title}
+            </h1>
+            <header className="mb-6 mt-2 border-gray-200 text-sm text-gray-500">
+              Posted on{" "}
+              {new Date(article.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </header>
             <ArticleContentViewer source={article.content} />
 
             <footer className="mt-12 pt-4 border-t border-gray-200 text-sm text-gray-500">

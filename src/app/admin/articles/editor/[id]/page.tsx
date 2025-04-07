@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import Image from 'next/image'
+import Image from 'next/image';
+import { getArticleTemplate } from '@/utils/articleTemplate';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
@@ -41,7 +42,8 @@ export default function EditArticlePage() {
     if (!isNewArticle && id) {
       fetchArticle(id);
     } else {
-      setArticle(prev => ({ ...prev, content: '' }));
+      const template = getArticleTemplate();
+      setArticle(prev => ({ ...prev, content: template }));
       setIsLoading(false);
     }
   }, [id, isNewArticle]);
