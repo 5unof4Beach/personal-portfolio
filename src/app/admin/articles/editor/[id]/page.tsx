@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { getArticleTemplate } from '@/utils/articleTemplate';
+import defaultTagsData from '@/data/defaultTags.json';
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor"),
@@ -219,27 +220,51 @@ export default function EditArticlePage() {
 
       <div className="mb-6">
         <label className="block mb-2 font-medium">Tags</label>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addTag();
-              }
-            }}
-            className="flex-1 p-2 border border-gray-300 rounded-md"
-            placeholder="Add a tag and press Enter"
-          />
-          <button
-            type="button"
-            onClick={addTag}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-          >
-            Add Tag
-          </button>
+        <div className="flex flex-col gap-2 mb-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addTag();
+                }
+              }}
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+              placeholder="Add a tag and press Enter"
+            />
+            <button
+              type="button"
+              onClick={addTag}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+            >
+              Add Tag
+            </button>
+          </div>
+          <div className="flex gap-2 items-center">
+            <span className="text-sm text-gray-600">Or select:</span>
+            <select 
+              className="p-2 border border-gray-300 rounded-md bg-white text-gray-700"
+              onChange={(e) => {
+                if (e.target.value) {
+                  setTagInput(e.target.value);
+                  // Add a slight delay before adding the tag to allow the user to see what was selected
+                  setTimeout(() => {
+                    addTag();
+                    e.target.value = '';
+                  }, 100);
+                }
+              }}
+              value=""
+            >
+              <option value="">-- Select a tag --</option>
+              {defaultTagsData.tags.map(tag => (
+                <option key={tag} value={tag}>{tag}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 min-h-[2.5rem] items-center">
           {article.tags.length > 0 ? (

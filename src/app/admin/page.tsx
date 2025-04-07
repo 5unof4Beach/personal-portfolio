@@ -76,14 +76,14 @@ function DashboardCard({
         <p className="mt-1 text-sm text-gray-600">{description}</p>
         <div className="mt-4">
           {isExternal ? (
-            <a
+            <Link
               href={link}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700"
             >
               Visit
-            </a>
+            </Link>
           ) : (
             <Link
               href={link}

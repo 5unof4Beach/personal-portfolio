@@ -41,9 +41,9 @@ export default function ArticleTagsSidebar({ articles }: ArticleTagsSidebarProps
   );
 
   return (
-    <aside className="w-full md:w-64 p-4 bg-white rounded-lg">
+    <aside className="sticky top-20 p-4 bg-white rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Articles by tag</h2>
-      <div className="space-y-6">
+      <div className="space-y-6 md:max-h-[70vh] md:overflow-y-auto md:pr-2">
           {sortedTags.map(tag => (
           <div key={tag} className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
