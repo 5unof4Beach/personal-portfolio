@@ -1,53 +1,53 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 // Simplified ArticleDocument interface
 export interface ArticleDocument extends Document {
-  content: string; // Changed to simple string
-  title: string; // Changed back to required
-  description: string; // Brief description/summary of the article
-  coverImage?: string; // Already optional
-  tags?: string[]; // Made optional
+  content: string;
+  title: string;
+  description: string;
+  coverImage?: string;
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
+  archived?: boolean;
 }
 
 const ArticleSchema = new Schema<ArticleDocument>(
   {
-    // Changed: Content is now the primary required field
     content: {
-      type: String, 
-      required: [true, 'Please provide content'],
+      type: String,
+      required: [true, "Please provide content"],
     },
-    // Make title required again
     title: {
       type: String,
-      required: [true, 'Please provide a title'], // Re-added required validation
+      required: [true, "Please provide a title"], // Re-added required validation
       trim: true,
-      maxlength: [100, 'Title cannot be more than 100 characters'],
+      maxlength: [100, "Title cannot be more than 100 characters"],
     },
-    // Add description field
     description: {
       type: String,
-      required: [true, 'Please provide a description'],
+      required: [true, "Please provide a description"],
       trim: true,
-      maxlength: [300, 'Description cannot be more than 300 characters'],
+      maxlength: [300, "Description cannot be more than 300 characters"],
     },
-    // coverImage remains optional
     coverImage: {
       type: String,
     },
-    // tags remains optional array of strings
     tags: [
       {
         type: String,
         trim: true,
-      }
+      },
     ],
+    archived: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );
 
-// Check if the model already exists to prevent overwriting during hot reloads
-const Article = mongoose.models.Article || mongoose.model<ArticleDocument>('Article', ArticleSchema);
+const Article =
+  mongoose.models.Article ||
+  mongoose.model<ArticleDocument>("Article", ArticleSchema);
 
-export default Article; 
+export default Article;

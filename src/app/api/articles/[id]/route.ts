@@ -121,7 +121,7 @@ export async function PATCH(
   }
 }
 
-// DELETE - Delete content (Consider if still needed)
+// DELETE - Archive content instead of deleting
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -143,7 +143,12 @@ export async function DELETE(
     
     await connectToDatabase();
     
-    const article = await Article.findByIdAndDelete(id);
+    // Archive the article by setting the `archived` field to true
+    const article = await Article.findByIdAndUpdate(
+      id,
+      { $set: { archived: true } },
+      { new: true } // Return the updated document
+    );
     
     if (!article) {
       return NextResponse.json(
@@ -155,11 +160,11 @@ export async function DELETE(
     revalidateTag(`article-detail-${id}`);
     revalidateTag("articles-list");
     
-    return NextResponse.json({ success: true, message: `Content ${id} deleted` });
+    return NextResponse.json({ success: true, message: `Content ${id} archived` });
   } catch (error) {
-    console.error('Error deleting content:', error);
+    console.error('Error archiving content:', error);
     return NextResponse.json(
-      { error: 'Failed to delete content' },
+      { error: 'Failed to archive content' },
       { status: 500 }
     );
   }

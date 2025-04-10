@@ -13,7 +13,7 @@ export async function GET() {
     // Fetch articles with fields needed for the list page
     const articles = await Article.find()
       .sort({ createdAt: -1 })
-      .select('title description tags coverImage createdAt');
+      .select('title description tags coverImage createdAt archived');
     
     return NextResponse.json(articles);
   } catch (error) {
