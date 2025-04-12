@@ -6,12 +6,26 @@ import { inter } from './fonts';
 import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://theducbui.com'),
   title: "Duc Bui - Software",
-  description: "Duc Bui's personal portfolio",
+  description: "A software development portfolio by Duc Bui.",
   icons: {
     icon: '/favicon.ico',
   },
   keywords: ['Duc Bui', 'Entrepreneur', 'Software Business Owner', 'Web Development', 'App Development', 'Backend Development', 'DevOps', 'Infrastructure', 'Project Management'],
+  openGraph: {
+    title: "Duc Bui - Software",
+    description: "A software development portfolio by Duc Bui.",
+    url: "https://www.theducbui.com/",
+    siteName: "Duc Bui",
+    images: [
+      {
+        url: "/public/open-graph-img.jpg",
+        alt: "Duc Bui Software Preview",
+      },
+    ],
+    type: "website",
+  },
 };
 
 export default function RootLayout({

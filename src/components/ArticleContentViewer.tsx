@@ -1,11 +1,4 @@
-'use client';
-
-import dynamic from 'next/dynamic';
-
-const MDViewer = dynamic(
-  () => import("@uiw/react-markdown-preview"),
-  { ssr: true }
-);
+import MarkdownPreview from '@/components/MDPreview'; 
 
 interface ArticleContentViewerProps {
   source: string;
@@ -14,7 +7,7 @@ interface ArticleContentViewerProps {
 export default function ArticleContentViewer({ source }: ArticleContentViewerProps) {
   return (
     <div data-color-mode="light">
-      <MDViewer source={source} />
+      <MarkdownPreview source={source} />
     </div>
   );
 } 

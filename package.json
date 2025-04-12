@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@uiw/react-markdown-preview": "^5.1.3",
     "@uiw/react-md-editor": "^4.0.5",
     "@vercel/analytics": "^1.5.0",
     "bcrypt": "^5.1.1",
