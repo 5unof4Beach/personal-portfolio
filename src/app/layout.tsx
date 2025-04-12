@@ -1,18 +1,29 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Footer from '@/components/Footer';
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { inter } from './fonts';
-import { Analytics } from "@vercel/analytics/react"
+import { inter } from "./fonts";
+import { Analytics } from "@vercel/analytics/react";
+import ogImage from "./opengraph-image.jpg";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://theducbui.com'),
+  metadataBase: new URL("https://theducbui.com"),
   title: "Duc Bui - Software",
   description: "A software development portfolio by Duc Bui.",
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
-  keywords: ['Duc Bui', 'Entrepreneur', 'Software Business Owner', 'Web Development', 'App Development', 'Backend Development', 'DevOps', 'Infrastructure', 'Project Management'],
+  keywords: [
+    "Duc Bui",
+    "Entrepreneur",
+    "Software Business Owner",
+    "Web Development",
+    "App Development",
+    "Backend Development",
+    "DevOps",
+    "Infrastructure",
+    "Project Management",
+  ],
   openGraph: {
     title: "Duc Bui - Software",
     description: "A software development portfolio by Duc Bui.",
@@ -20,11 +31,21 @@ export const metadata: Metadata = {
     siteName: "Duc Bui",
     images: [
       {
-        url: "/public/open-graph-img.jpg",
-        alt: "Duc Bui Software Preview",
+        url: ogImage.src,
+        width: ogImage.width,
+        height: ogImage.height,
       },
     ],
     type: "website",
+  },
+  twitter: {
+    images: [
+      {
+        url: ogImage.src,
+        width: ogImage.width,
+        height: ogImage.height,
+      },
+    ],
   },
 };
 
