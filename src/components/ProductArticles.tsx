@@ -45,7 +45,7 @@ export default async function ProductArticles() {
                     {article.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="rounded bg-stone-100 px-2 py-1 text-xs font-medium font-semibold text-gray-700 "
+                        className="rounded bg-stone-100 px-2 py-1 text-xs font-semibold text-gray-700"
                       >
                         # {tag}
                       </span>
@@ -53,7 +53,7 @@ export default async function ProductArticles() {
                   </div>
                 </div>
                 <Link
-                  href={`/articles/${article._id}`}
+                  href={`/articles/${article.slug}`}
                   className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
                 >
                   View Product

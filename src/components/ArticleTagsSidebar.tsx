@@ -6,6 +6,7 @@ interface Article {
   title: string;
   createdAt: string;
   tags: string[];
+  slug: string;
 }
 
 interface ArticlesByTag {
@@ -44,25 +45,25 @@ export default function ArticleTagsSidebar({ articles }: ArticleTagsSidebarProps
     <aside className="sticky top-20 p-4 bg-white rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Articles by tag</h2>
       <div className="space-y-6 md:max-h-[70vh] md:overflow-y-auto md:pr-2">
-          {sortedTags.map(tag => (
+        {sortedTags.map(tag => (
           <div key={tag} className="space-y-2">
             <h3 className="text-lg font-medium text-gray-900">
               #{tag} <span className="text-sm text-gray-500">({articlesByTag[tag].length})</span>
             </h3>
             <ul className="space-y-2">
-                {articlesByTag[tag].map(article => (
-                  <li key={article._id}>
-                    <Link 
-                      href={`/articles/${article._id}`}
+              {articlesByTag[tag].map(article => (
+                <li key={article._id}>
+                  <Link 
+                    href={`/articles/${article.slug}`}
                     className="text-sm text-gray-600 hover:text-gray-900 hover:underline block truncate"
-                    >
-                      {article.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+                  >
+                    {article.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          ))}
+        ))}
       </div>
     </aside>
   );

@@ -10,6 +10,7 @@ export interface ArticleDocument extends Document {
   createdAt: Date;
   updatedAt: Date;
   archived?: boolean;
+  slug: string;
 }
 
 const ArticleSchema = new Schema<ArticleDocument>(
@@ -20,7 +21,7 @@ const ArticleSchema = new Schema<ArticleDocument>(
     },
     title: {
       type: String,
-      required: [true, "Please provide a title"], // Re-added required validation
+      required: [true, "Please provide a title"],
       trim: true,
       maxlength: [100, "Title cannot be more than 100 characters"],
     },
@@ -41,10 +42,41 @@ const ArticleSchema = new Schema<ArticleDocument>(
     ],
     archived: {
       type: Boolean,
+      default: false,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      index: true,
     },
   },
   { timestamps: true }
 );
+
+// Add middleware to generate slug from title
+ArticleSchema.pre('validate', async function(next) {
+  if (this.isModified('title')) {
+    const baseSlug = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    
+    // Check for existing slugs and append number if needed
+    let slug = baseSlug;
+    let counter = 1;
+    while (await mongoose.models.Article?.findOne({ 
+      slug,
+      _id: { $ne: this._id } // Exclude current document when updating
+    })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+    this.slug = slug;
+  }
+  next();
+});
 
 const Article =
   mongoose.models.Article ||

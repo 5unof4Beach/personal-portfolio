@@ -13,6 +13,7 @@ interface Article {
   tags: string[];
   createdAt: string;
   archived?: boolean;
+  slug: string;
 }
 
 export default function ArticlesListPage() {
@@ -174,7 +175,7 @@ export default function ArticlesListPage() {
                   {/* Actions Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link
-                      href={`/articles/${article._id}`}
+                      href={`/articles/${article.slug}`}
                       className="text-gray-800 hover:text-gray-900 mr-4"
                       target="_blank"
                     >
