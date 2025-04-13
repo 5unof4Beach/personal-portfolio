@@ -20,6 +20,7 @@ interface Article {
   content: string | undefined;
   coverImage?: string;
   tags: string[];
+  slug?: string;
 }
 
 export default function EditArticlePage() {
@@ -66,6 +67,7 @@ export default function EditArticlePage() {
         content: data.content || '',
         coverImage: data.coverImage || '',
         tags: data.tags || [],
+        slug: data.slug || '',
       });
     } catch (error) {
       console.error('Error fetching article:', error);
@@ -86,7 +88,7 @@ export default function EditArticlePage() {
       setIsSaving(true);
       
       const method = isNewArticle ? 'POST' : 'PATCH';
-      const url = isNewArticle ? '/api/articles' : `/api/articles/${id}`;
+      const url = isNewArticle ? '/api/articles' : `/api/articles/${id}/${article.slug}`;
       
       const articleToSave = { 
         title: article.title,
@@ -94,6 +96,7 @@ export default function EditArticlePage() {
         content: article.content || '', 
         coverImage: article.coverImage || null,
         tags: article.tags,
+        // The slug will be generated on the server from the title
       };
 
       const response = await fetch(url, {
@@ -123,6 +126,7 @@ export default function EditArticlePage() {
           content: savedData.content ?? prev.content,
           coverImage: savedData.coverImage ?? prev.coverImage,
           tags: savedData.tags ?? prev.tags,
+          slug: savedData.slug ?? prev.slug,
         })); 
         alert('Article saved successfully!');
       }
@@ -325,4 +329,4 @@ export default function EditArticlePage() {
       </div>
     </div>
   );
-} 
+}

@@ -31,7 +31,7 @@ export default async function ArticlesPage() {
             <div className="space-y-16">
               {articles.map((article) => (
                 <article key={article._id} className="group">
-                  <Link href={`/articles/${article._id}`}>
+                  <Link href={`/articles/${article.slug}`}>
                     <div className="flex flex-col space-y-2">
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <time dateTime={article.createdAt}>{formatDate(article.createdAt)}</time>

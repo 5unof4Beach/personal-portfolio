@@ -13,6 +13,7 @@ interface Article {
   tags: string[];
   createdAt: string;
   archived?: boolean;
+  slug: string;
 }
 
 export default function ArticlesListPage() {
@@ -107,6 +108,9 @@ export default function ArticlesListPage() {
                   Archived
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Slug
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tags
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -154,6 +158,9 @@ export default function ArticlesListPage() {
                       </span>
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{article.slug}</div>
+                  </td>
                   {/* Tags Column */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
@@ -174,7 +181,7 @@ export default function ArticlesListPage() {
                   {/* Actions Column */}
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link
-                      href={`/articles/${article._id}`}
+                      href={`/articles/${article.slug}`}
                       className="text-gray-800 hover:text-gray-900 mr-4"
                       target="_blank"
                     >

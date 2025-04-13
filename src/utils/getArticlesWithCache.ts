@@ -9,23 +9,31 @@ interface Article {
   coverImage?: string;
   tags: string[];
   createdAt: string;
+  updatedAt: string;
+  archived?: boolean;
+  slug: string;
 }
 
-async function fetchArticlesFromDb(): Promise<Article[]> {
+async function fetchArticles(): Promise<Article[]> {
   try {
     await connectToDatabase();
     const articles = await Article.find({
-      archived: false,
+      archived: { $ne: true },
       tags: { $in: ["product"] },
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .select("_id title description coverImage tags createdAt updatedAt slug")
+      .lean();
 
     return articles.map((article) => ({
-      _id: article._id.toString(),
+      _id: article._id as string,
       title: article.title,
-      coverImage: article.coverImage,
       description: article.description,
-      tags: article.tags,
+      coverImage: article.coverImage,
+      tags: article.tags || [],
       createdAt: article.createdAt.toISOString(),
+      updatedAt: article.updatedAt.toISOString(),
+      slug: article.slug,
     }));
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -34,7 +42,7 @@ async function fetchArticlesFromDb(): Promise<Article[]> {
 }
 
 const getArticles = unstable_cache(
-  async () => fetchArticlesFromDb(),
+  async () => fetchArticles(),
   ["articles-list"],
   { tags: ["articles-list"], revalidate: false }
 );

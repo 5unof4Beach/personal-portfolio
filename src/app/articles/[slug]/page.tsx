@@ -3,9 +3,11 @@ import Article from "@/models/Article";
 import { notFound } from "next/navigation";
 import ArticleContentViewer from "@/components/ArticleContentViewer";
 import { unstable_cache } from "next/cache";
+import { Types } from "mongoose";
+import { redirect } from 'next/navigation'
 
 interface ArticlePageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; slug: string }>;
 }
 
 interface ArticleData {
@@ -15,12 +17,18 @@ interface ArticleData {
   coverImage?: string;
   createdAt: string;
   updatedAt: string;
+  slug: string;
 }
 
 async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
   try {
     await connectToDatabase();
-    const article = await Article.findById(id);
+    const article = await Article.findOne({ 
+      $or: [
+        { _id: Types.ObjectId.isValid(id) ? id : null },
+        { slug: id }
+      ]
+    });
 
     if (!article) {
       return null;
@@ -36,6 +44,7 @@ async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
       coverImage: article.coverImage,
       createdAt: article.createdAt.toISOString(),
       updatedAt: article.updatedAt.toISOString(),
+      slug: article.slug
     };
   } catch (error) {
     console.error("Error fetching content:", error);
@@ -43,11 +52,11 @@ async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
   }
 }
 
-async function getContent(articleId: string): Promise<ArticleData | null> {
+async function getContent(articleSlug: string): Promise<ArticleData | null> {
   const cachedFetch = unstable_cache(
-    async () => fetchArticleFromDb(articleId),
-    [`article-detail-${articleId}`],
-    { tags: [`article-detail-${articleId}`], revalidate: false }
+    async () => fetchArticleFromDb(articleSlug),
+    [`article-detail-${articleSlug}`],
+    { tags: [`article-detail-${articleSlug}`], revalidate: false }
   );
   
   return cachedFetch();
@@ -55,11 +64,16 @@ async function getContent(articleId: string): Promise<ArticleData | null> {
 
 export default async function ArticlePage(props: ArticlePageProps) {
   const params = await props.params;
-  const id = params.id;
-  const article = await getContent(id);
+  const slug = params.slug;
+  const article = await getContent(slug);
 
   if (!article) {
     notFound();
+  }
+
+  // Redirect to the canonical URL if needed
+  if (params.slug !== article.slug) {
+    return redirect(`/articles/${article.slug}`);
   }
 
   return (
