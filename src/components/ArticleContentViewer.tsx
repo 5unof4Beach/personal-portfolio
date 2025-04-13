@@ -1,4 +1,6 @@
-import MarkdownPreview from '@/components/MDPreview'; 
+'use client'
+
+import MarkdownPreview from '@uiw/react-markdown-preview'; 
 
 interface ArticleContentViewerProps {
   source: string;

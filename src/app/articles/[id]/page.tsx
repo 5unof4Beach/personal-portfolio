@@ -64,7 +64,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
 
   return (
     <>
-      <main className="bg-stone-100 min-h-screen px-4 bg-white">
+      <main className="min-h-screen px-4 bg-white">
         <div className="container mx-auto bg-white p-6 md:p-10 rounded-lg max-w-3xl lg:max-w-4xl">
           <article>
             <h1 className="text-4xl font-bold text-gray-900">
