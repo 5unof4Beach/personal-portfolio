@@ -39,7 +39,7 @@ export async function GET(
 // PATCH - Update article (handle all fields)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string, slug: string }> }
+  { params }: { params: Promise<{ id: string; slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -60,7 +60,7 @@ export async function PATCH(
 
     // Extract all fields from the body
     const data = await request.json();
-    const { title, content, coverImage, tags, description } = data;
+    const { title, content, coverImage, tags, description, productUrl, archived } = data;
 
     // Optional: Add validation here if needed (e.g., ensure title is not empty if provided)
     if (title !== undefined && !title) {
@@ -83,6 +83,8 @@ export async function PATCH(
     if (coverImage !== undefined) updateData.coverImage = coverImage || null;
     if (tags !== undefined) updateData.tags = tags;
     if (description !== undefined) updateData.description = description;
+    if (productUrl !== undefined) updateData.productUrl = productUrl || null;
+    if (archived !== undefined) updateData.archived = archived || false;
 
     // Check if there's anything to update
     if (Object.keys(updateData).length === 0) {
@@ -123,7 +125,7 @@ export async function PATCH(
 // DELETE - Delete a single article
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string, slug: string }> }
+  { params }: { params: Promise<{ id: string; slug: string }> }
 ) {
   try {
     const { id, slug } = await params;
@@ -142,16 +144,16 @@ export async function DELETE(
         { status: 400 }
       );
     }
-    
+
     await connectToDatabase();
-    
+
     // Archive the article by setting the `archived` field to true
     const article = await Article.findByIdAndUpdate(
       id,
       { $set: { archived: true } },
       { new: true } // Return the updated document
     );
-    
+
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
@@ -160,7 +162,7 @@ export async function DELETE(
     revalidateTag(`article-detail-${id}`);
     revalidateTag(`article-detail-${slug}`);
 
-    return NextResponse.json({ message: "Article archived successfully" });
+    return NextResponse.json(article);
   } catch (error) {
     console.error("Error in DELETE /api/articles/[id]:", error);
     return NextResponse.json(

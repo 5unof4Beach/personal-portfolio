@@ -11,6 +11,7 @@ export interface ArticleDocument extends Document {
   updatedAt: Date;
   archived?: boolean;
   slug: string;
+  productUrl?: string;
 }
 
 const ArticleSchema = new Schema<ArticleDocument>(
@@ -34,6 +35,18 @@ const ArticleSchema = new Schema<ArticleDocument>(
     coverImage: {
       type: String,
     },
+    productUrl: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function (v: string | null | undefined) {
+          if (!v) return true; // Allow null/undefined values
+          return /^(ftp|http|https):\/\/[^ "]+$/.test(v);
+        },
+        message: (props: { value: string }) =>
+          `${props.value} is not a valid URL!`,
+      },
+    },
     tags: [
       {
         type: String,
@@ -56,20 +69,22 @@ const ArticleSchema = new Schema<ArticleDocument>(
 );
 
 // Add middleware to generate slug from title
-ArticleSchema.pre('validate', async function(next) {
-  if (this.isModified('title')) {
+ArticleSchema.pre("validate", async function (next) {
+  if (this.isModified("title")) {
     const baseSlug = this.title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-    
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
     // Check for existing slugs and append number if needed
     let slug = baseSlug;
     let counter = 1;
-    while (await mongoose.models.Article?.findOne({ 
-      slug,
-      _id: { $ne: this._id } // Exclude current document when updating
-    })) {
+    while (
+      await mongoose.models.Article?.findOne({
+        slug,
+        _id: { $ne: this._id }, // Exclude current document when updating
+      })
+    ) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }

@@ -52,12 +52,23 @@ export default async function ProductArticles() {
                     ))}
                   </div>
                 </div>
-                <Link
-                  href={`/articles/${article.slug}`}
-                  className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
-                >
-                  View Product
-                </Link>
+                <div className="flex w-full flex-col xl:flex-row justify-between">
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
+                  >
+                    View product
+                  </Link>
+                  {article.productUrl && (
+                    <Link
+                      href={article.productUrl}
+                      className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
+                      target="_blank"
+                    >
+                      Go to product page
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           ))}

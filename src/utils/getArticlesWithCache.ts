@@ -12,6 +12,7 @@ interface Article {
   updatedAt: string;
   archived?: boolean;
   slug: string;
+  productUrl?: string;
 }
 
 async function fetchArticles(): Promise<Article[]> {
@@ -22,7 +23,7 @@ async function fetchArticles(): Promise<Article[]> {
       tags: { $in: ["product"] },
     })
       .sort({ createdAt: -1 })
-      .select("_id title description coverImage tags createdAt updatedAt slug")
+      .select("_id title description coverImage tags createdAt updatedAt slug productUrl")
       .lean();
 
     return articles.map((article) => ({
@@ -34,6 +35,7 @@ async function fetchArticles(): Promise<Article[]> {
       createdAt: article.createdAt.toISOString(),
       updatedAt: article.updatedAt.toISOString(),
       slug: article.slug,
+      productUrl: article.productUrl || null,
     }));
   } catch (error) {
     console.error("Error fetching articles:", error);

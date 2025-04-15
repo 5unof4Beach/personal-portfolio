@@ -19,6 +19,7 @@ interface Article {
   description: string;
   content: string | undefined;
   coverImage?: string;
+  productUrl?: string;
   tags: string[];
   slug?: string;
 }
@@ -37,6 +38,7 @@ export default function EditArticlePage() {
     content: undefined,
     coverImage: '',
     tags: [],
+    productUrl: '',
   });
   const [tagInput, setTagInput] = useState('');
   
@@ -68,6 +70,7 @@ export default function EditArticlePage() {
         coverImage: data.coverImage || '',
         tags: data.tags || [],
         slug: data.slug || '',
+        productUrl: data.productUrl || '',
       });
     } catch (error) {
       console.error('Error fetching article:', error);
@@ -96,6 +99,7 @@ export default function EditArticlePage() {
         content: article.content || '', 
         coverImage: article.coverImage || null,
         tags: article.tags,
+        productUrl: article.productUrl || null,
         // The slug will be generated on the server from the title
       };
 
@@ -127,6 +131,7 @@ export default function EditArticlePage() {
           coverImage: savedData.coverImage ?? prev.coverImage,
           tags: savedData.tags ?? prev.tags,
           slug: savedData.slug ?? prev.slug,
+          productUrl: savedData.productUrl ?? prev.productUrl,
         })); 
         alert('Article saved successfully!');
       }
@@ -220,6 +225,18 @@ export default function EditArticlePage() {
             />
           </div>
         )}
+      </div>
+
+      <div className="mb-6">
+        <label htmlFor="productUrl" className="block mb-2 font-medium">Product URL</label>
+        <input
+          id="productUrl"
+          type="url"
+          value={article.productUrl || ''}
+          onChange={(e) => setArticle(prev => ({ ...prev, productUrl: e.target.value }))}
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="Product URL (optional)"
+        />
       </div>
 
       <div className="mb-6">

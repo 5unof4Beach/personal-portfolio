@@ -10,7 +10,7 @@ export async function GET() {
   try {
     await connectToDatabase();
     const articles = await Article.find()
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .select("title description tags coverImage createdAt archived slug");
 
     return NextResponse.json(articles);
