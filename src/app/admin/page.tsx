@@ -47,6 +47,11 @@ export default function AdminDashboard() {
             link="/admin/articles"
           />
           <DashboardCard
+            title="Manage Campaign Banners"
+            description="Update your campaign banners"
+            link="/admin/banners"
+          />
+          <DashboardCard
             title="View Portfolio"
             description="Preview your portfolio as visitors will see it"
             link="/"

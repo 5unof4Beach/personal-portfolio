@@ -56,8 +56,9 @@ export default async function ProductArticles() {
                   <Link
                     href={`/articles/${article.slug}`}
                     className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
+                    prefetch={true}
                   >
-                    View product
+                    Read
                   </Link>
                   {article.productUrl && (
                     <Link
@@ -65,7 +66,7 @@ export default async function ProductArticles() {
                       className="mt-2 rounded bg-stone-800 px-4 py-2 text-sm font-medium text-white transition duration-300 hover:bg-stone-900 w-fit"
                       target="_blank"
                     >
-                      Go to product page
+                      Product page
                     </Link>
                   )}
                 </div>
