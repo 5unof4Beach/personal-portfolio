@@ -16,6 +16,7 @@ import { DotButton, useDotButton } from "./EmblaCarouselDotButton";
 import "./styles/embla.css";
 import { Banner } from "@/utils/getBannersWithCache";
 import SvgViewer from "../SVGViewer";
+import Link from 'next/link';
 
 const TWEEN_FACTOR_BASE = 0.2;
 
@@ -114,8 +115,20 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             <div className="embla__slide" key={index}>
               <div className="embla__parallax">
                 <div className="embla__parallax__layer">
-                  <div className="aspect-[3/1] w-full h-auto">
+                  <div className="relative aspect-[3/1] w-full h-auto">
                     <SvgViewer svg={banner.bannerImage || ""} />
+                    {banner.action?.actionUrl && banner.action?.actionText && (
+                      <Link
+                        href={banner.action.actionUrl}
+                        target={banner.action.isExternal ? "_blank" : "_self"}
+                        rel={banner.action.isExternal ? "noopener noreferrer" : ""}
+                        className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity duration-300"
+                      >
+                        <span className="px-6 py-3 bg-white/70 text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                          {banner.action.actionText}
+                        </span>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

@@ -52,9 +52,10 @@ export async function PATCH(
       title,
       bannerImage,
       archived,
+      action
     } = data;
 
-    // Optional: Add validation here if needed (e.g., ensure title is not empty if provided)
+    // Optional: Add validation here if needed
     if (title !== undefined && !title) {
       return NextResponse.json(
         { error: "Title cannot be empty" },
@@ -69,10 +70,29 @@ export async function PATCH(
       );
     }
 
+    // Validate action fields if action URL is provided
+    if (action?.actionUrl && !action.actionText) {
+      return NextResponse.json(
+        { error: "Action text is required when URL is provided" },
+        { status: 400 }
+      );
+    }
+
     const updateData: Partial<typeof data> = {};
     if (title !== undefined) updateData.title = title;
     if (bannerImage !== undefined) updateData.bannerImage = bannerImage || null;
     if (archived !== undefined) updateData.archived = archived || false;
+    if (action !== undefined) {
+      if (action === null || (!action.actionUrl && !action.actionText)) {
+        updateData.action = null;
+      } else {
+        updateData.action = {
+          actionText: action.actionText,
+          actionUrl: action.actionUrl,
+          isExternal: action.isExternal || false
+        };
+      }
+    }
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(

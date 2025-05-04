@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getArticleTemplate } from "@/utils/articleTemplate";
 import SvgViewer from "@/components/SVGViewer";
 
 interface Banner {
   _id?: string;
   title: string;
   bannerImage?: string;
+  action?: {
+    actionText: string;
+    actionUrl: string;
+    isExternal: boolean;
+  };
 }
 
 export default function EditBanner() {
@@ -22,14 +26,17 @@ export default function EditBanner() {
   const [banner, setBanner] = useState<Banner>({
     title: "",
     bannerImage: "",
+    action: {
+      actionText: "",
+      actionUrl: "",
+      isExternal: false
+    }
   });
 
   useEffect(() => {
     if (!isNewBanner && id) {
       fetchArticle(id);
     } else {
-      const template = getArticleTemplate();
-      setBanner((prev) => ({ ...prev, content: template }));
       setIsLoading(false);
     }
   }, [id, isNewBanner]);
@@ -48,13 +55,17 @@ export default function EditBanner() {
         _id: data._id,
         title: data.title || "",
         bannerImage: data.bannerImage || "",
+        action: {
+          actionText: data.action?.actionText || "",
+          actionUrl: data.action?.actionUrl || "",
+          isExternal: data.action?.isExternal || false
+        }
       });
     } catch (error) {
       console.error("Error fetching banner:", error);
       setBanner((prev) => ({
         ...prev,
         title: "Error Loading",
-        content: `# Error loading content\n${error}`,
       }));
     } finally {
       setIsLoading(false);
@@ -70,9 +81,16 @@ export default function EditBanner() {
       const method = isNewBanner ? "POST" : "PATCH";
       const url = isNewBanner ? "/api/banners" : `/api/banners/${id}`;
 
-      const articleToSave = {
+      const bannerToSave = {
         title: banner.title,
         bannerImage: banner.bannerImage || null,
+        action: banner.action?.actionUrl 
+          ? {
+              actionText: banner.action.actionText,
+              actionUrl: banner.action.actionUrl,
+              isExternal: banner.action.isExternal
+            }
+          : null
       };
 
       const response = await fetch(url, {
@@ -80,7 +98,7 @@ export default function EditBanner() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(articleToSave),
+        body: JSON.stringify(bannerToSave),
       });
 
       if (!response.ok) {
@@ -99,6 +117,7 @@ export default function EditBanner() {
           _id: savedData._id ?? prev._id,
           title: savedData.title ?? prev.title,
           bannerImage: savedData.bannerImage ?? prev.bannerImage,
+          action: savedData.action ?? prev.action
         }));
         alert("Banner saved successfully!");
       }
@@ -150,12 +169,83 @@ export default function EditBanner() {
             setBanner((prev) => ({ ...prev, bannerImage: e.target.value }))
           }
           className="w-full p-2 border border-gray-300 rounded-md"
-          placeholder="https://example.com/image.jpg"
+          placeholder="Paste your SVG code here"
         />
-        <div className="mt-2 w-full h-auto border rounded-md overflow-hidden">
-          <SvgViewer
-            svg={banner.bannerImage || ""}
-          />
+        {banner.bannerImage && (
+          <div className="mt-2 w-full h-auto border rounded-md overflow-hidden">
+            <SvgViewer svg={banner.bannerImage} />
+          </div>
+        )}
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-medium mb-4">Action Settings</h2>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="actionUrl" className="block mb-2 font-medium">
+              Action URL
+            </label>
+            <input
+              id="actionUrl"
+              type="url"
+              value={banner.action?.actionUrl || ""}
+              onChange={(e) =>
+                setBanner((prev) => ({
+                  ...prev,
+                  action: {
+                    ...prev.action!,
+                    actionUrl: e.target.value
+                  }
+                }))
+              }
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="https://example.com"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="actionText" className="block mb-2 font-medium">
+              Action Text
+            </label>
+            <input
+              id="actionText"
+              type="text"
+              value={banner.action?.actionText || ""}
+              onChange={(e) =>
+                setBanner((prev) => ({
+                  ...prev,
+                  action: {
+                    ...prev.action!,
+                    actionText: e.target.value
+                  }
+                }))
+              }
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Take a look"
+              defaultValue="Take a look"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="isExternal"
+              type="checkbox"
+              checked={banner.action?.isExternal || false}
+              onChange={(e) =>
+                setBanner((prev) => ({
+                  ...prev,
+                  action: {
+                    ...prev.action!,
+                    isExternal: e.target.checked
+                  }
+                }))
+              }
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+            />
+            <label htmlFor="isExternal" className="ml-2 block text-sm text-gray-900">
+              Open in new tab
+            </label>
+          </div>
         </div>
       </div>
 

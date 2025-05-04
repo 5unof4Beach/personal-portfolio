@@ -6,6 +6,11 @@ export interface Banner {
   _id: string;
   title: string;
   bannerImage: string;
+  action: {
+    actionText: string;
+    actionUrl: string;
+    isExternal: boolean;
+  };
 }
 
 async function fetchBanners(): Promise<Banner[]> {
@@ -15,13 +20,14 @@ async function fetchBanners(): Promise<Banner[]> {
       archived: { $ne: true },
     })
       .sort({ createdAt: -1 })
-      .select("_id title bannerImage")
+      .select("_id title bannerImage action")
       .lean();
 
     return banners.map((banner) => ({
       _id: banner._id as string,
       title: banner.title,
       bannerImage: banner.bannerImage,
+      action: banner.action || {},
     }));
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -29,10 +35,9 @@ async function fetchBanners(): Promise<Banner[]> {
   }
 }
 
-const getBanners = unstable_cache(
-  async () => fetchBanners(),
-  ["banner-list"],
-  { tags: ["banner-list"], revalidate: false }
-);
+const getBanners = unstable_cache(async () => fetchBanners(), ["banner-list"], {
+  tags: ["banner-list"],
+  revalidate: false,
+});
 
 export default getBanners;
