@@ -6,6 +6,7 @@ import { authOptions } from "@/helpers/auth";
 import { Types } from "mongoose";
 import { deleteCachedData } from "@/lib/redis";
 import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
+import { revalidatePath } from "next/cache";
 
 // GET - Get a single article by ID or slug
 export async function GET(
@@ -117,6 +118,10 @@ export async function PATCH(
     deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${id}`);
     deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${slug}`);
     deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
+    revalidatePath("/");
+    revalidatePath("/articles");
+    revalidatePath(`/articles/${id}`);
+    revalidatePath(`/articles/${slug}`);
 
     return NextResponse.json(article);
   } catch (error) {
@@ -170,6 +175,10 @@ export async function DELETE(
     deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${id}`);
     deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${slug}`);
     deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
+    revalidatePath("/");
+    revalidatePath("/articles");
+    revalidatePath(`/articles/${id}`);
+    revalidatePath(`/articles/${slug}`);
 
     return NextResponse.json(article);
   } catch (error) {

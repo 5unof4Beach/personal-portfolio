@@ -1,6 +1,11 @@
 'use client'
 
-import MarkdownPreview from '@uiw/react-markdown-preview'; 
+import dynamic from 'next/dynamic';
+
+const MarkdownPreview = dynamic(() => import('@uiw/react-markdown-preview'), {
+  ssr: true,
+  loading: () => <div className="animate-pulse h-96 bg-gray-100 rounded-md" /> // Loading placeholder
+});
 
 interface ArticleContentViewerProps {
   source: string;
@@ -12,4 +17,4 @@ export default function ArticleContentViewer({ source }: ArticleContentViewerPro
       <MarkdownPreview source={source} />
     </div>
   );
-} 
+}

@@ -1,31 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
-import Article from "@/models/Article";
+import Banner from "@/models/Banner";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/helpers/auth";
-import {deleteCachedData} from "@/lib/redis";
+import { deleteCachedData } from "@/lib/redis";
 import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 import { revalidatePath } from "next/cache";
 
-// GET - Get all articles (Return necessary fields for preview)
 export async function GET() {
   try {
     await connectToDatabase();
-    const articles = await Article.find()
+    const banners = await Banner.find()
       .sort({ updatedAt: -1 })
-      .select("title description tags coverImage createdAt archived slug");
+      .select("title bannerImage createdAt archived");
 
-    return NextResponse.json(articles);
+    return NextResponse.json(banners);
   } catch (error) {
-    console.error("Error fetching articles:", error);
+    console.error("Error fetching banners:", error);
     return NextResponse.json(
-      { error: "Failed to fetch articles" },
+      { error: "Failed to fetch banners" },
       { status: 500 }
     );
   }
 }
 
-// POST - Create new article (handle all fields)
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -37,19 +36,18 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase();
 
-    const article = await Article.create({
+    const banner = await Banner.create({
       ...data,
     });
 
-    deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
+    deleteCachedData(REDIS_CACHE_CONSTANTS.BANNERS_LIST_KEY);
     revalidatePath("/");
-    revalidatePath("/articles");
 
-    return NextResponse.json(article);
+    return NextResponse.json(banner);
   } catch (error) {
-    console.error("Error in POST /api/articles:", error);
+    console.error("Error in POST /api/banners:", error);
     return NextResponse.json(
-      { error: "Failed to create article" },
+      { error: "Failed to create banner" },
       { status: 500 }
     );
   }

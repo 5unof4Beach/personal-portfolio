@@ -2,10 +2,12 @@ import React from "react";
 import profileData from "@/data/profileData.json"; // Import data from JSON
 import ProductArticles from "@/components/ProductArticles";
 import Link from "next/link";
+import BannerCarousel from "@/components/BannerCarousel";
 
 export default function Home() {
   return (
     <main className="bg-stone-100 text-gray-900 font-sans">
+
       {/* Hero Section */}
       <section id="about" className="bg-stone-200">
         <div className="container mx-auto px-6 py-20 text-center">
@@ -71,6 +73,11 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Carousel Section */}
+      <section className="bg-stone-50">
+        <BannerCarousel />
+      </section>
+
       {/* About Section */}
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-6">
@@ -107,7 +114,9 @@ export default function Home() {
       )}
 
       {/* Projects Section */}
-      <ProductArticles />
+      <section>
+        <ProductArticles />
+      </section>
 
       {/* Contact Section */}
       <section
