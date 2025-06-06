@@ -3,7 +3,8 @@ import connectToDatabase from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/helpers/auth";
-import { revalidateTag } from "next/cache";
+import {deleteCachedData} from "@/lib/redis";
+import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 
 // GET - Get all articles (Return necessary fields for preview)
 export async function GET() {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       ...data,
     });
 
-    revalidateTag("articles-list");
+    deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
 
     return NextResponse.json(article);
   } catch (error) {

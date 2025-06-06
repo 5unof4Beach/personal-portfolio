@@ -3,8 +3,9 @@ import connectToDatabase from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/helpers/auth";
-import { revalidateTag } from "next/cache";
 import { Types } from "mongoose";
+import { deleteCachedData } from "@/lib/redis";
+import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 
 // GET - Get a single article by ID or slug
 export async function GET(
@@ -60,7 +61,15 @@ export async function PATCH(
 
     // Extract all fields from the body
     const data = await request.json();
-    const { title, content, coverImage, tags, description, productUrl, archived } = data;
+    const {
+      title,
+      content,
+      coverImage,
+      tags,
+      description,
+      productUrl,
+      archived,
+    } = data;
 
     // Optional: Add validation here if needed (e.g., ensure title is not empty if provided)
     if (title !== undefined && !title) {
@@ -105,9 +114,9 @@ export async function PATCH(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    revalidateTag(`article-detail-${id}`);
-    revalidateTag(`article-detail-${slug}`);
-    revalidateTag("articles-list");
+    deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${id}`);
+    deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${slug}`);
+    deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
 
     return NextResponse.json(article);
   } catch (error) {
@@ -158,9 +167,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    revalidateTag("articles-list");
-    revalidateTag(`article-detail-${id}`);
-    revalidateTag(`article-detail-${slug}`);
+    deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${id}`);
+    deleteCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${slug}`);
+    deleteCachedData(REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY);
 
     return NextResponse.json(article);
   } catch (error) {

@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import getArticles from "@/utils/getArticlesWithCache";
+import fetchArticles from "@/utils/getArticlesWithCache";
 
 export default async function ProductArticles() {
-  const articles = await getArticles();
+  const articles = await fetchArticles();
 
   if (articles.length === 0) {
     return null;

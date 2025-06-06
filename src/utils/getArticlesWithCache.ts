@@ -1,6 +1,7 @@
 import connectToDatabase from "@/lib/mongodb";
 import Article from "@/models/Article";
-import { unstable_cache } from "next/cache";
+import { getCachedData, cacheData } from "@/lib/redis";
+import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 
 interface Article {
   _id: string;
@@ -17,14 +18,30 @@ interface Article {
 
 async function fetchArticles(): Promise<Article[]> {
   try {
+    const cachedArticles = await getCachedData(
+      REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY
+    );
+
+    if (cachedArticles) {
+      return cachedArticles;
+    }
+
     await connectToDatabase();
     const articles = await Article.find({
       archived: { $ne: true },
       tags: { $in: ["product"] },
     })
       .sort({ createdAt: -1 })
-      .select("_id title description coverImage tags createdAt updatedAt slug productUrl")
+      .select(
+        "_id title description coverImage tags createdAt updatedAt slug productUrl"
+      )
       .lean();
+
+    await cacheData(
+      REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY,
+      articles,
+      REDIS_CACHE_CONSTANTS.ARTICLES_LIST_KEY_EXPIRATION
+    );
 
     return articles.map((article) => ({
       _id: article._id as string,
@@ -43,10 +60,4 @@ async function fetchArticles(): Promise<Article[]> {
   }
 }
 
-const getArticles = unstable_cache(
-  async () => fetchArticles(),
-  ["articles-list"],
-  { tags: ["articles-list"], revalidate: false }
-);
-
-export default getArticles;
+export default fetchArticles;

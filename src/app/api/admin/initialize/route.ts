@@ -1,92 +1,115 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
-import User from '@/models/User';
-import Profile from '@/models/Profile';
+import { NextRequest, NextResponse } from "next/server";
+import connectToDatabase from "@/lib/mongodb";
+import User from "@/models/User";
+import Profile from "@/models/Profile";
+import { checkRateLimit, resetRateLimit } from "@/lib/redis";
+import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 
 // This is a protected setup route to initialize the admin account
 // Only accessible when no admin exists or using a setup key
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await checkRateLimit(
+      REDIS_CACHE_CONSTANTS.ADMIN_SETUP_RATE_LIMIT_KEY
+    );
+
+    if (!rateLimitResult.success && rateLimitResult.resetInSeconds !== null) {
+      const minutes = Math.ceil(rateLimitResult.resetInSeconds / 60);
+      return NextResponse.json(
+        {
+          error: `Too many failed setup attempts. Please try again in ${minutes} minutes.`,
+        },
+        { status: 429 }
+      );
+    }
+
     // Get setup key from environment
     const setupKey = process.env.ADMIN_SETUP_KEY;
-    
+
     // Get data from request
     const data = await request.json();
     const { name, email, password, setupKeyProvided } = data;
-    
+
     // Validate required fields
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
-    
+
     // Connect to database
     await connectToDatabase();
-    
+
     // Check if admin already exists
-    const existingAdmin = await User.findOne({ role: 'admin' });
-    
+    const existingAdmin = await User.findOne({ role: "admin" });
+
     // If admin exists, require setup key
     if (existingAdmin && setupKeyProvided !== setupKey) {
       return NextResponse.json(
-        { error: 'Admin user already exists. Setup key required for additional admins.' },
+        {
+          error:
+            "Admin user already exists. Setup key required for additional admins.",
+        },
         { status: 403 }
       );
     }
-    
+
     // Check if user with this email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: "User with this email already exists" },
         { status: 400 }
       );
     }
-    
+
     // Create the admin user
     const newUser = new User({
       name,
       email,
       password,
-      role: 'admin',
+      role: "admin",
     });
-    
+
     await newUser.save();
-    
+
+    // Reset rate limit counter
+    await resetRateLimit(REDIS_CACHE_CONSTANTS.ADMIN_SETUP_RATE_LIMIT_KEY);
+
     // Check if a profile exists, if not, create a starter profile
     const existingProfile = await Profile.findOne({});
     if (!existingProfile) {
       const starterProfile = new Profile({
         name,
-        title: 'Web Developer',
-        about: 'Hello! This is a placeholder for your about section. Edit this in the admin panel.',
-        skills: ['HTML', 'CSS', 'JavaScript'],
+        title: "Web Developer",
+        about:
+          "Hello! This is a placeholder for your about section. Edit this in the admin panel.",
+        skills: ["HTML", "CSS", "JavaScript"],
         social: {
-          linkedin: '',
-          github: '',
-          twitter: '',
-          website: '',
+          linkedin: "",
+          github: "",
+          twitter: "",
+          website: "",
         },
         contact: {
           email,
-          phone: '',
+          phone: "",
         },
       });
-      
+
       await starterProfile.save();
     }
-    
+
     return NextResponse.json(
-      { success: true, message: 'Admin user and profile created successfully' },
+      { success: true, message: "Admin user and profile created successfully" },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating admin:', error);
+    console.error("Error creating admin:", error);
     return NextResponse.json(
-      { error: 'Failed to create admin user' },
+      { error: "Failed to create admin user" },
       { status: 500 }
     );
   }
-} 
+}

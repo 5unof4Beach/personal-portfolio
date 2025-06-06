@@ -2,9 +2,10 @@ import connectToDatabase from "@/lib/mongodb";
 import Article from "@/models/Article";
 import { notFound } from "next/navigation";
 import ArticleContentViewer from "@/components/ArticleContentViewer";
-import { unstable_cache } from "next/cache";
 import { Types } from "mongoose";
 import { redirect } from 'next/navigation'
+import { getCachedData, cacheData } from "@/lib/redis";
+import { REDIS_CACHE_CONSTANTS } from "@/constants/redis-cache";
 
 interface ArticlePageProps {
   params: Promise<{ id: string; slug: string }>;
@@ -22,6 +23,11 @@ interface ArticleData {
 
 async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
   try {
+    const cachedArticle = await getCachedData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${id}`);
+    if (cachedArticle) {
+      return cachedArticle;
+    }
+
     await connectToDatabase();
     const article = await Article.findOne({ 
       $or: [
@@ -37,7 +43,7 @@ async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
     const contentString =
       typeof article.content === "string" ? article.content : "";
 
-    return {
+    const articleData = {
       _id: article._id.toString(),
       content: contentString,
       title: article.title,
@@ -46,26 +52,20 @@ async function fetchArticleFromDb(id: string): Promise<ArticleData | null> {
       updatedAt: article.updatedAt.toISOString(),
       slug: article.slug
     };
+
+    await cacheData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${article._id}`, articleData, REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY_EXPIRATION);
+    await cacheData(`${REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY}:${article.slug}`, articleData, REDIS_CACHE_CONSTANTS.ARTICLES_DETAIL_KEY_EXPIRATION);
+    return articleData;
   } catch (error) {
     console.error("Error fetching content:", error);
     return null;
   }
 }
 
-async function getContent(articleSlug: string): Promise<ArticleData | null> {
-  const cachedFetch = unstable_cache(
-    async () => fetchArticleFromDb(articleSlug),
-    [`article-detail-${articleSlug}`],
-    { tags: [`article-detail-${articleSlug}`], revalidate: false }
-  );
-  
-  return cachedFetch();
-}
-
 export default async function ArticlePage(props: ArticlePageProps) {
   const params = await props.params;
   const slug = params.slug;
-  const article = await getContent(slug);
+  const article = await fetchArticleFromDb(slug);
 
   if (!article) {
     notFound();

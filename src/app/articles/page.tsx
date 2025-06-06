@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import ArticleTagsSidebar from "@/components/ArticleTagsSidebar";
-import getArticles from "@/utils/getArticlesWithCache";
+import fetchArticles from "@/utils/getArticlesWithCache";
 
 export default async function ArticlesPage() {
-  const articles = await getArticles();
+  const articles = await fetchArticles();
 
   function formatDate(dateString: string) {
     const date = new Date(dateString);
